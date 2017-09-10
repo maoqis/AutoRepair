@@ -16,9 +16,21 @@ public class UserService {
 
     public User createManager(User user) {
         user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
-        user.setRole("Manager");
+        user.setRole("manager");
         userRepository.save(user);
         User newUser = userRepository.findByUsername(user.getUsername());
         return newUser;
+    }
+
+    public User createUser(User user) {
+        user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
+        user.setRole("user");
+        userRepository.save(user);
+        User newUser = userRepository.findByUsername(user.getUsername());
+        return newUser;
+    }
+
+    public User getUserByUsername(String username) {
+        return userRepository.findByUsername(username);
     }
 }

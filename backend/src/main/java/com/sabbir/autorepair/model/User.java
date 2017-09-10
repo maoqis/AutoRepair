@@ -1,7 +1,5 @@
 package com.sabbir.autorepair.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import javax.persistence.*;
 
 @Entity
