@@ -1,6 +1,6 @@
 package com.sabbir.autorepair;
 
-import com.sabbir.autorepair.model.User;
+import com.sabbir.autorepair.entity.UserWithPassword;
 import com.sabbir.autorepair.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -34,15 +34,16 @@ class ApplicationLoader implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        final User manager = new User();
+        final UserWithPassword manager = new UserWithPassword();
         manager.setUsername("sabbir");
         manager.setPassword("ahmed");
         userService.createManager(manager);
 
-        final User user = new User();
+        final UserWithPassword user = new UserWithPassword();
         user.setUsername("user1");
         user.setPassword("123456");
         userService.createUser(user);
+
     }
 }
 

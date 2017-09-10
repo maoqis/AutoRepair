@@ -1,16 +1,14 @@
 package com.sabbir.autorepair.controller;
 
+import com.sabbir.autorepair.entity.UserWithPassword;
 import com.sabbir.autorepair.model.User;
 import com.sabbir.autorepair.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
+import java.security.Principal;
 import java.util.List;
 
 @RestController
@@ -20,13 +18,13 @@ public class ManagerController {
     private UserService userService;
 
     @RequestMapping(method = RequestMethod.GET)
-    public List<User> getAllUsers() {
-        final List<User> users = new ArrayList<>();
-        return users;
+    public List<User> getAllManager() {
+        final List<User> managers = userService.getAllManagers();
+        return managers;
     }
 
     @RequestMapping(method = RequestMethod.POST)
-    public ResponseEntity<User> createManager(@RequestBody User user) {
+    public ResponseEntity<User> createManager(@RequestBody UserWithPassword user) {
         User existingUser = userService.getUserByUsername(user.getUsername());
         if (existingUser != null) {
             return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
@@ -36,6 +34,48 @@ public class ManagerController {
             return new ResponseEntity<User>(newUser, HttpStatus.OK);
         } catch (Exception ex) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
+
+    @RequestMapping(value = "/{id}", method = RequestMethod.PUT)
+    public ResponseEntity<User> updateManager(@PathVariable Long id, @RequestBody UserWithPassword user) {
+        User existingUser = userService.getUserById(id);
+        if (existingUser == null || user.getId() == null || id != user.getId()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        } else if (!existingUser.getUsername().equals(user.getUsername())) {
+            return ResponseEntity.status(HttpStatus.PRECONDITION_FAILED).body(null);
+        }
+        try {
+            User updatedUser = userService.updateUser(user);
+            return new ResponseEntity<User>(updatedUser, HttpStatus.OK);
+        } catch (Exception ex) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
+
+
+    @RequestMapping(value = "/{id}", method = RequestMethod.GET)
+    public ResponseEntity<User> getManager(@PathVariable Long id) {
+        User existingUser = userService.getUserById(id);
+        if (existingUser == null || !existingUser.getRole().equals("manager")) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        } else {
+            return new ResponseEntity<User>(existingUser, HttpStatus.OK);
+        }
+    }
+
+    @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
+    public ResponseEntity<User> deleteManager(@PathVariable Long id, Principal principal) {
+        User existingUser = userService.getUserById(id);
+        User currentUser = userService.getUserByUsername(principal.getName());
+        if (existingUser == null || !existingUser.getRole().equals("manager")) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        } else if (existingUser.getId() == currentUser.getId()) {
+            return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED).body(null);
+        } else {
+            userService.deleteUser(id);
+            existingUser.setId(null);
+            return new ResponseEntity<User>(existingUser, HttpStatus.OK);
         }
     }
 }
