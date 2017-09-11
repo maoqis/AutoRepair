@@ -81,9 +81,9 @@ class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .authorizeRequests()
                 .antMatchers("/api/manager/**").hasAuthority("manager")
                 .antMatchers("/api/user/**").hasAuthority("manager")
+                .antMatchers("/api/login").hasAnyAuthority("manager", "user")
                 .and()
                 .httpBasic();
-        ;
 
     }
 
@@ -99,5 +99,6 @@ class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     public void configure(WebSecurity web) {
         web.debug(false);
+        web.ignoring().antMatchers("/api/registeruser");
     }
 }
