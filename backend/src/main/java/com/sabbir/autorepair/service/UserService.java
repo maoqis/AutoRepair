@@ -35,7 +35,13 @@ public class UserService {
 
     public User updateUser(UserWithPassword userWithPassword) {
         final User existingUser = getUserById(userWithPassword.getId());
-        existingUser.setRole("manager");
+        if (userWithPassword.getRole() != null && !userWithPassword.getRole().isEmpty()) {
+            existingUser.setRole(userWithPassword.getRole());
+        }
+        return updateExistingUser(existingUser, userWithPassword);
+    }
+
+    private User updateExistingUser(User existingUser, UserWithPassword userWithPassword) {
         userRepository.save(existingUser);
         if (userWithPassword.getPassword() != null) {
             final UserPassword userPassword = userPasswordRepository.findByUserId(existingUser.getId());
@@ -64,6 +70,10 @@ public class UserService {
 
     public List<User> getAllManagers() {
         return userRepository.findByRole("manager");
+    }
+
+    public List<User> getAllUsers() {
+        return userRepository.findByRole("user");
     }
 
     public void deleteUser(Long id) {

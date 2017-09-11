@@ -80,6 +80,7 @@ class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .authorizeRequests()
                 .antMatchers("/api/manager/**").hasAuthority("manager")
+                .antMatchers("/api/user/**").hasAuthority("manager")
                 .and()
                 .httpBasic();
         ;
