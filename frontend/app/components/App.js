@@ -1,19 +1,23 @@
-import React from 'react';
+import React, { Component } from 'react';
 
 require('./App.css');
 
-export default () => <h1>Hello World</h1>;
-
-/*
-export default class App extends React.Component {
+export default class Home extends Component {
   constructor(props) {
     super(props);
+    this.state = {
+      testState: 0
+    };
   }
 
   render() {
     return (
-      <h1>Hello World</h1>
+      <div className="App">
+        <div className="main">
+          <h1>AutoRepair</h1>
+          <p>An Auto Repair Management Tool</p>
+        </div>
+      </div>
     );
   }
 }
-*/
