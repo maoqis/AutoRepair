@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.security.Principal;
 
 @RestController
 @RequestMapping("/api")
@@ -33,14 +32,21 @@ public class LoginController {
         }
     }
 
-    @RequestMapping(value = "/login")
-    public ResponseEntity<User> loginUser(@RequestBody UserWithPassword userWithPassword, Principal principal) {
-        User existingUser = userService.getUserByUsername(userWithPassword.getUsername());
-        User currentUser = userService.getUserByUsername(principal.getName());
-        if (existingUser == null || existingUser.getId() != currentUser.getId()) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
-        } else {
+    @RequestMapping(value = "/login", method = RequestMethod.POST)
+    public ResponseEntity<User> loginUser(@RequestBody UserWithPassword userWithPassword) {
+        if (userService.checkUserPassword(userWithPassword)) {
+            User existingUser = userService.getUserByUsername(userWithPassword.getUsername());
             return new ResponseEntity<User>(existingUser, HttpStatus.OK);
+        } else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
         }
+    }
+
+    @RequestMapping(
+            value = "/**",
+            method = RequestMethod.OPTIONS
+    )
+    public ResponseEntity handle() {
+        return new ResponseEntity(HttpStatus.OK);
     }
 }

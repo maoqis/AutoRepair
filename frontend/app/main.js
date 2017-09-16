@@ -1,11 +1,12 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { BrowserRouter as Router } from 'react-router-dom';
-import Routes from './Routes';
+
+import App from './App';
 
 ReactDOM.render(
   <Router>
-    <Routes />
+    <App />
   </Router>,
   document.body.appendChild(document.createElement('div'))
 );

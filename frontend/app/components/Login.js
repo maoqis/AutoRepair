@@ -1,14 +1,17 @@
 import React, { Component } from 'react';
-import { Button, FormGroup, FormControl, ControlLabel } from 'react-bootstrap';
+import PropTypes from 'prop-types';
+import { Button, FormGroup, FormControl, ControlLabel, Modal } from 'react-bootstrap';
 import './Login.css';
 
-export default class Login extends Component {
+class Login extends Component {
   constructor(props) {
     super(props);
 
     this.state = {
       username: '',
-      password: ''
+      password: '',
+      show: false,
+      loginInfo: 'Please wait...'
     };
 
     this.handleChange = this.handleChange.bind(this);
@@ -25,8 +28,20 @@ export default class Login extends Component {
     });
   }
 
+
   handleSubmit(event) {
     event.preventDefault();
+    this.setState(
+      {
+        show: true
+      }
+    );
+    this.props.authenticate(this.state.username, this.state.password, (success) => {
+      if (!success) {
+        this.setState({ loginInfo: 'login unsuccessful' });
+        window.setTimeout(() => { this.setState({ show: false, loginInfo: 'Please wait' }); }, 3000);
+      }
+    });
   }
 
   render() {
@@ -59,7 +74,22 @@ export default class Login extends Component {
             Login
           </Button>
         </form>
+        <Modal show={this.state.show}>
+          <Modal.Header>
+            <Modal.Title>Logging in</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            <p>{this.state.loginInfo}</p>
+          </Modal.Body>
+        </Modal>
       </div>
     );
   }
 }
+
+Login.propTypes = {
+  authenticate: PropTypes.func.isRequired
+};
+
+export default Login;
+

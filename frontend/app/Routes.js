@@ -1,11 +1,25 @@
 import React from 'react';
-import { Route, Switch } from 'react-router-dom';
+import PropTypes from 'prop-types';
+import { Switch } from 'react-router-dom';
 
-import App from './components/App';
+import Home from './components/Home';
 import Login from './components/Login';
+import AdvanceRoute from './components/AdvanceRoute';
 
-export default () =>
-  (<Switch>
-    <Route path="/" exact component={App} />
-    <Route path="/login" exact component={Login} />
-  </Switch>);
+function Routes({ authStatus }) {
+  return (
+    <Switch>
+      <AdvanceRoute path="/" exact component={Home} authStatus={authStatus} needAuthentication />
+      <AdvanceRoute path="/login" exact component={Login} authStatus={authStatus} needAuthentication={false} />
+    </Switch>
+  );
+}
+
+Routes.propTypes = {
+  authStatus: PropTypes.shape({
+    isAuthenticated: PropTypes.func.isRequired,
+    authenticate: PropTypes.func.isRequired
+  }).isRequired
+};
+
+export default Routes;

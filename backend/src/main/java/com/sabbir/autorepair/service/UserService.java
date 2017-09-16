@@ -10,10 +10,12 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.logging.Logger;
 
 
 @Service
 public class UserService {
+    private static Logger logger = Logger.getLogger(UserService.class.getName());
     @Autowired
     private UserRepository userRepository;
 
@@ -86,6 +88,16 @@ public class UserService {
         user.setUsername(userWithPassword.getUsername());
         user.setRole(role);
         return user;
+    }
+
+    public boolean checkUserPassword(UserWithPassword userWithPassword) {
+        final User user = userRepository.findByUsername(userWithPassword.getUsername());
+        if (user != null) {
+            final UserPassword userPassword = userPasswordRepository.findByUserId(user.getId());
+            final String passwordHash = bCryptPasswordEncoder.encode(userWithPassword.getPassword());
+            return bCryptPasswordEncoder.matches(userWithPassword.getPassword(), userPassword.getPassword());
+        }
+        return false;
     }
 
 }
