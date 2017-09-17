@@ -6,7 +6,7 @@ import RouteNavItem from './RouteNavItem';
 
 /* eslint react/prop-types: 0 */
 
-function RouteNavBar({ ...rest }) {
+function RouteNavBar({ getRole, ...rest }) {
   return (
     <Route
       {...rest}
@@ -18,9 +18,9 @@ function RouteNavBar({ ...rest }) {
           <Navbar>
             <Nav>
               <RouteNavItem href="/" content="Home" />
-              <RouteNavItem href="/repairs" content="Reparis" />
-              <RouteNavItem href="/users" content="Users" />
-              <RouteNavItem href="/managers" content="Managers" />
+              <RouteNavItem href="/repairs" content="Repairs" />
+              {getRole() === 'manager' ? <RouteNavItem href="/users" content="Users" /> : null }
+              {getRole() === 'manager' ? <RouteNavItem href="/managers" content="Managers" /> : null }
               <RouteNavItem href="/logout" content="Logout" />
             </Nav>
           </Navbar>

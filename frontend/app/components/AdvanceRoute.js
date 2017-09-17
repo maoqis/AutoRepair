@@ -15,7 +15,7 @@ function AdvanceRoute({ component: CmpntToShow, authStatus, needAuthentication, 
           }
         }
         if (!needAuthentication || (needAuthentication && authStatus.isAuthenticated())) {
-          return <CmpntToShow {...props} {...authStatus} />;
+          return <CmpntToShow {...props} {...authStatus} {...rest} />;
         }
         return <Redirect to="/login" />;
       }}

@@ -7,14 +7,15 @@ import Login from './components/Login';
 import AdvanceRoute from './components/AdvanceRoute';
 import NotFound from './components/NotFound';
 import Logout from './components/Logout';
+import Users from './components/Users';
 
-function Routes({ authStatus }) {
+function Routes({ authStatus, restMethods }) {
   return (
     <Switch>
       <AdvanceRoute path="/" exact component={Home} authStatus={authStatus} needAuthentication />
       <AdvanceRoute path="/login" exact component={Login} authStatus={authStatus} needAuthentication={false} />
       <AdvanceRoute path="/logout" exact component={Logout} authStatus={authStatus} needAuthentication={false} />
-      <AdvanceRoute path="/users" exact component={NotFound} authStatus={authStatus} needAuthentication />
+      <AdvanceRoute path="/users" exact component={Users} authStatus={authStatus} restMethods={restMethods} needAuthentication />
       <AdvanceRoute path="/managers" exact component={NotFound} authStatus={authStatus} needAuthentication />
       <AdvanceRoute path="/repairs" exact component={NotFound} authStatus={authStatus} needAuthentication />
       <Route component={NotFound} />
@@ -26,6 +27,9 @@ Routes.propTypes = {
   authStatus: PropTypes.shape({
     isAuthenticated: PropTypes.func.isRequired,
     authenticate: PropTypes.func.isRequired
+  }).isRequired,
+  restMethods: PropTypes.shape({
+    getUsers: PropTypes.func.isRequired
   }).isRequired
 };
 
