@@ -1,11 +1,11 @@
 import React, { Component } from 'react';
 import Routes from './Routes';
 
-import { LOGIN_URL } from './Constants';
 
+import { LOGIN_URL } from './Constants';
+import RouteNavBar from './components/RouteNavBar';
 import './App.css';
 
-/* eslint-disable */
 
 class App extends Component {
   constructor(props) {
@@ -13,11 +13,21 @@ class App extends Component {
     this.state = {
       isAuthenticated: false,
       username: '',
-      password: ''
+      password: '',
+      role: '',
     };
-
     this.authenticate = this.authenticate.bind(this);
     this.isAuthenticated = this.isAuthenticated.bind(this);
+    this.logout = this.logout.bind(this);
+  }
+
+  logout() {
+    this.setState({
+      isAuthenticated: false,
+      username: '',
+      password: '',
+      role: '',
+    });
   }
 
   authenticate(username, password, callBack) {
@@ -43,8 +53,11 @@ class App extends Component {
       }
       callBack(false);
       return Promise.reject(Error(response.status));
-    }).then(() => {
+    }).then((data) => {
       callBack(true);
+      this.setState({
+        role: data.role,
+      });
       return Promise.resolve();
     }).catch(() => {
     });
@@ -57,9 +70,15 @@ class App extends Component {
   render() {
     const authStatus = {
       isAuthenticated: this.isAuthenticated,
-      authenticate: this.authenticate
+      authenticate: this.authenticate,
+      logout: this.logout
     };
-    return <Routes authStatus={authStatus} />;
+    return (
+      <div className="App container">
+        <RouteNavBar />
+        <Routes authStatus={authStatus} />
+      </div>
+    );
   }
 }
 
