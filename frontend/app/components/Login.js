@@ -36,12 +36,12 @@ class Login extends Component {
         show: true
       }
     );
-    this.props.authenticate(this.state.username, this.state.password, (success) => {
-      if (!success) {
+    this.props.authenticate(this.state.username, this.state.password)
+      .then(() => Promise.resolve())
+      .catch(() => {
         this.setState({ loginInfo: 'login unsuccessful' });
         window.setTimeout(() => { this.setState({ show: false, loginInfo: 'Please wait' }); }, 3000);
-      }
-    });
+      });
   }
 
   render() {

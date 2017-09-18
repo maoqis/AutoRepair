@@ -24,7 +24,7 @@ class Users extends React.Component {
       .then((users) => {
         this.setState({ userList: users });
         return Promise.resolve();
-      }).catch();
+      }).catch(() => {});
   }
 
   deleteUser(userId) {
