@@ -20,6 +20,7 @@ class App extends Component {
     this.logout = this.logout.bind(this);
     this.getRole = this.getRole.bind(this);
     this.getUsers = this.getUsers.bind(this);
+    this.deleteUser = this.deleteUser.bind(this);
   }
 
   getRole() {
@@ -39,6 +40,21 @@ class App extends Component {
     }).then((response) => {
       if (response.ok) {
         return response.json();
+      }
+      return Promise.reject(Error(response.status));
+    });
+  }
+
+  deleteUser(userId) {
+    return fetch(`${GET_USERS_URL}/${userId}`, {
+      method: 'delete',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Basic ${btoa(`${this.state.username}:${this.state.password}`)}`
+      }
+    }).then((response) => {
+      if (response.ok) {
+        return Promise.resolve();
       }
       return Promise.reject(Error(response.status));
     });
@@ -98,7 +114,8 @@ class App extends Component {
     };
 
     const restMethods = {
-      getUsers: this.getUsers
+      getUsers: this.getUsers,
+      deleteUser: this.deleteUser
     };
     return (
       <div className="App container">
