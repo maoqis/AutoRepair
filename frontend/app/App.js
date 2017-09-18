@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import Routes from './Routes';
 
-import { LOGIN_URL, GET_USERS_URL, PING_URL, DELETE_USER_URL } from './Constants';
+import { LOGIN_URL, GET_USERS_URL, PING_URL, DELETE_USER_URL, UPDATE_USER_URL } from './Constants';
 import RouteNavBar from './components/RouteNavBar';
 import './App.css';
 
@@ -22,6 +22,7 @@ class App extends Component {
     this.deleteUser = this.deleteUser.bind(this);
     this.setCookie = this.setCookie.bind(this);
     this.getCookie = this.getCookie.bind(this);
+    this.updateUser = this.updateUser.bind(this);
   }
 
   componentWillMount() {
@@ -145,6 +146,25 @@ class App extends Component {
     });
   }
 
+  updateUser(user, password) {
+    return fetch(`${UPDATE_USER_URL}/${user.id}`, {
+      method: 'put',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `${this.state.basicAuthToken}`
+      },
+      body: JSON.stringify({
+        ...user,
+        password
+      })
+    }).then((response) => {
+      if (response.ok) {
+        return Promise.resolve();
+      }
+      return Promise.reject(Error(response.status));
+    });
+  }
+
   logout() {
     this.setState({
       isAuthenticated: false,
@@ -163,7 +183,8 @@ class App extends Component {
 
     const restMethods = {
       getUsers: this.getUsers,
-      deleteUser: this.deleteUser
+      deleteUser: this.deleteUser,
+      updateUser: this.updateUser
     };
     return (
       <div className="App container">

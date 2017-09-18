@@ -47,7 +47,7 @@ public class UserService {
         userRepository.save(existingUser);
         if (userWithPassword.getPassword() != null) {
             final UserPassword userPassword = userPasswordRepository.findByUserId(existingUser.getId());
-            userPassword.setPassword(bCryptPasswordEncoder.encode(userPassword.getPassword()));
+            userPassword.setPassword(bCryptPasswordEncoder.encode(userWithPassword.getPassword()));
             userPasswordRepository.save(userPassword);
         }
         return userRepository.findById(userWithPassword.getId());

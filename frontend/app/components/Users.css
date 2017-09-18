@@ -1,3 +1,14 @@
 .table td {
    text-align: center;   
 }
+
+@media all and (min-width: 480px) {
+  .Edit {
+    padding: 20px 0;
+  }
+
+  .Edit form {
+    margin: 0 auto;
+    max-width: 320px;
+  }
+}
