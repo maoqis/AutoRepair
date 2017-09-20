@@ -1,5 +1,9 @@
 .table td {
-   text-align: center;   
+  text-align: center;
+}
+
+.buttonBar {
+  margin-bottom: 10px;
 }
 
 @media all and (min-width: 480px) {

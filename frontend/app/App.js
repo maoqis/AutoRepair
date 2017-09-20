@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import Routes from './Routes';
 
-import { LOGIN_URL, GET_USERS_URL, PING_URL, DELETE_USER_URL, UPDATE_USER_URL } from './Constants';
+import { LOGIN_URL, GET_USERS_URL, PING_URL, DELETE_USER_URL, UPDATE_USER_URL, CREATE_USER_URL } from './Constants';
 import RouteNavBar from './components/RouteNavBar';
 import './App.css';
 
@@ -23,6 +23,7 @@ class App extends Component {
     this.setCookie = this.setCookie.bind(this);
     this.getCookie = this.getCookie.bind(this);
     this.updateUser = this.updateUser.bind(this);
+    this.createUser = this.createUser.bind(this);
   }
 
   componentWillMount() {
@@ -165,6 +166,25 @@ class App extends Component {
     });
   }
 
+  createUser(username, password) {
+    return fetch(CREATE_USER_URL, {
+      method: 'post',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `${this.state.basicAuthToken}`
+      },
+      body: JSON.stringify({
+        username,
+        password
+      })
+    }).then((response) => {
+      if (response.ok) {
+        return Promise.resolve();
+      }
+      return Promise.reject(Error(response.status));
+    });
+  }
+
   logout() {
     this.setState({
       isAuthenticated: false,
@@ -184,7 +204,8 @@ class App extends Component {
     const restMethods = {
       getUsers: this.getUsers,
       deleteUser: this.deleteUser,
-      updateUser: this.updateUser
+      updateUser: this.updateUser,
+      createUser: this.createUser
     };
     return (
       <div className="App container">
