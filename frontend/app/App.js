@@ -24,6 +24,7 @@ class App extends Component {
     this.getCookie = this.getCookie.bind(this);
     this.updateUser = this.updateUser.bind(this);
     this.createUser = this.createUser.bind(this);
+    this.doWebRequest = this.doWebRequest.bind(this);
   }
 
   componentWillMount() {
@@ -58,23 +59,6 @@ class App extends Component {
     return '';
   }
 
-  getUsers() {
-    return fetch(GET_USERS_URL, {
-      method: 'get',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `${this.state.basicAuthToken}`
-      }
-    }).then((response) => {
-      if (response.ok) {
-        return response.json();
-      }
-      if (response.status === 401) {
-        this.logout();
-      }
-      return Promise.reject(Error(response.status));
-    });
-  }
 
   setCookie(cname, cvalue, exhour) {
     const d = new Date();
@@ -132,54 +116,37 @@ class App extends Component {
     return this.state.isAuthenticated;
   }
 
+  getUsers() {
+    return this.doWebRequest(GET_USERS_URL, 'get');
+  }
+
   deleteUser(userId) {
-    return fetch(`${DELETE_USER_URL}/${userId}`, {
-      method: 'delete',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `${this.state.basicAuthToken}`
-      }
-    }).then((response) => {
-      if (response.ok) {
-        return Promise.resolve();
-      }
-      return Promise.reject(Error(response.status));
-    });
+    return this.doWebRequest(`${DELETE_USER_URL}/${userId}`, 'delete');
   }
 
   updateUser(user, password) {
-    return fetch(`${UPDATE_USER_URL}/${user.id}`, {
-      method: 'put',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `${this.state.basicAuthToken}`
-      },
-      body: JSON.stringify({
-        ...user,
-        password
-      })
-    }).then((response) => {
-      if (response.ok) {
-        return Promise.resolve();
-      }
-      return Promise.reject(Error(response.status));
-    });
+    return this.doWebRequest(`${UPDATE_USER_URL}/${user.id}`, 'put', { ...user, password });
   }
 
   createUser(username, password) {
-    return fetch(CREATE_USER_URL, {
-      method: 'post',
+    return this.doWebRequest(CREATE_USER_URL, 'post', { username, password });
+  }
+
+  doWebRequest(url, method, body) {
+    return fetch(url, {
+      method,
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `${this.state.basicAuthToken}`
+        Authorization: this.state.basicAuthToken
       },
-      body: JSON.stringify({
-        username,
-        password
-      })
+      body: body ? (JSON.stringify(body)) : {},
     }).then((response) => {
       if (response.ok) {
-        return Promise.resolve();
+        return response.json();
+      } else if (response.status === 401) {
+        if (this.isAuthenticated()) {
+          this.logout();
+        }
       }
       return Promise.reject(Error(response.status));
     });
