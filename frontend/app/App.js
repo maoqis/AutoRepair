@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
 import Routes from './Routes';
 
-import { LOGIN_URL, GET_USERS_URL, PING_URL, DELETE_USER_URL, UPDATE_USER_URL, CREATE_USER_URL } from './Constants';
+import { LOGIN_URL, GET_USERS_URL, PING_URL, DELETE_USER_URL, UPDATE_USER_URL, CREATE_USER_URL,
+  GET_MANAGERS_URL, DELETE_MANAGER_URL, UPDATE_MANAGER_URL, CREATE_MANAGER_URL } from './Constants';
 import RouteNavBar from './components/RouteNavBar';
 import './App.css';
 
@@ -24,6 +25,11 @@ class App extends Component {
     this.getCookie = this.getCookie.bind(this);
     this.updateUser = this.updateUser.bind(this);
     this.createUser = this.createUser.bind(this);
+    this.getManagers = this.getManagers.bind(this);
+    this.deleteManager = this.deleteManager.bind(this);
+    this.updateManager = this.updateManager.bind(this);
+    this.createManager = this.createManager.bind(this);
+
     this.doWebRequest = this.doWebRequest.bind(this);
   }
 
@@ -116,6 +122,22 @@ class App extends Component {
     return this.state.isAuthenticated;
   }
 
+  getManagers() {
+    return this.doWebRequest(GET_MANAGERS_URL, 'get');
+  }
+
+  deleteManager(userId) {
+    return this.doWebRequest(`${DELETE_MANAGER_URL}/${userId}`, 'delete');
+  }
+
+  updateManager(user, password) {
+    return this.doWebRequest(`${UPDATE_MANAGER_URL}/${user.id}`, 'put', { ...user, password });
+  }
+
+  createManager(username, password) {
+    return this.doWebRequest(CREATE_MANAGER_URL, 'post', { username, password });
+  }
+
   getUsers() {
     return this.doWebRequest(GET_USERS_URL, 'get');
   }
@@ -172,7 +194,11 @@ class App extends Component {
       getUsers: this.getUsers,
       deleteUser: this.deleteUser,
       updateUser: this.updateUser,
-      createUser: this.createUser
+      createUser: this.createUser,
+      getManagers: this.getManagers,
+      deleteManager: this.deleteManager,
+      updateManager: this.updateManager,
+      createManager: this.createManager
     };
     return (
       <div className="App container">

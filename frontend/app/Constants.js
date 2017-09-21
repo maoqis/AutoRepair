@@ -5,4 +5,9 @@ export const DELETE_USER_URL = `${GET_USERS_URL}`;
 export const UPDATE_USER_URL = `${GET_USERS_URL}`;
 export const CREATE_USER_URL = `${GET_USERS_URL}`;
 
+export const GET_MANAGERS_URL = `${REST_SERVER_BASE_URL}/manager`;
+export const DELETE_MANAGER_URL = `${GET_MANAGERS_URL}`;
+export const UPDATE_MANAGER_URL = `${GET_MANAGERS_URL}`;
+export const CREATE_MANAGER_URL = `${GET_MANAGERS_URL}`;
+
 export const PING_URL = `${REST_SERVER_BASE_URL}/ping`;
