@@ -187,7 +187,8 @@ class App extends Component {
     const authStatus = {
       isAuthenticated: this.isAuthenticated,
       authenticate: this.authenticate,
-      logout: this.logout
+      logout: this.logout,
+      getRole: this.getRole
     };
 
     const restMethods = {
