@@ -11,7 +11,7 @@ function RouteNavBar({ getRole, ...rest }) {
     <Route
       {...rest}
       render={(props) => {
-        if (props.location.pathname === '/login') {
+        if (props.location.pathname === '/login' || props.location.pathname === '/registeruser') {
           return null;
         }
         return (

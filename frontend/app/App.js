@@ -1,8 +1,9 @@
 import React, { Component } from 'react';
 import Routes from './Routes';
 
-import { LOGIN_URL, GET_USERS_URL, PING_URL, DELETE_USER_URL, UPDATE_USER_URL, CREATE_USER_URL,
-  GET_MANAGERS_URL, DELETE_MANAGER_URL, UPDATE_MANAGER_URL, CREATE_MANAGER_URL } from './Constants';
+import { LOGIN_URL, GET_USERS_URL, PING_URL, DELETE_USER_URL, UPDATE_USER_URL,
+  CREATE_USER_URL, GET_MANAGERS_URL, DELETE_MANAGER_URL, UPDATE_MANAGER_URL,
+  CREATE_MANAGER_URL, REGISTER_USER_URL } from './Constants';
 import RouteNavBar from './components/RouteNavBar';
 import './App.css';
 
@@ -29,8 +30,10 @@ class App extends Component {
     this.deleteManager = this.deleteManager.bind(this);
     this.updateManager = this.updateManager.bind(this);
     this.createManager = this.createManager.bind(this);
+    this.registerUser = this.registerUser.bind(this);
 
     this.doWebRequest = this.doWebRequest.bind(this);
+    this.doWebRequestWithoutAuth = this.doWebRequestWithoutAuth.bind(this);
   }
 
   componentWillMount() {
@@ -118,6 +121,30 @@ class App extends Component {
     });
   }
 
+  registerUser(username, password) {
+    return this.doWebRequestWithoutAuth(REGISTER_USER_URL, 'post', { username, password });
+  }
+
+  doWebRequestWithoutAuth(url, method, body) {
+    return fetch(url, {
+      method,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: body ? (JSON.stringify(body)) : {},
+    }).then((response) => {
+      if (response.ok) {
+        return response.json();
+      } else if (response.status === 401) {
+        if (this.isAuthenticated()) {
+          this.logout();
+        }
+      }
+      return Promise.reject(Error(response.status));
+    });
+  }
+
+
   isAuthenticated() {
     return this.state.isAuthenticated;
   }
@@ -186,7 +213,6 @@ class App extends Component {
   render() {
     const authStatus = {
       isAuthenticated: this.isAuthenticated,
-      authenticate: this.authenticate,
       logout: this.logout,
       getRole: this.getRole
     };
@@ -199,7 +225,9 @@ class App extends Component {
       getManagers: this.getManagers,
       deleteManager: this.deleteManager,
       updateManager: this.updateManager,
-      createManager: this.createManager
+      createManager: this.createManager,
+      authenticate: this.authenticate,
+      registerUser: this.registerUser
     };
     return (
       <div className="App container">

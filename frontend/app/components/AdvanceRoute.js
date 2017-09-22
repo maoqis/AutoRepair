@@ -9,7 +9,7 @@ function AdvanceRoute({ component: CmpntToShow, authStatus, needAuthentication, 
     <Route
       {...rest}
       render={(props) => {
-        if (props.match.path === '/login') {
+        if (props.match.path === '/login' || props.match.path === '/registeruser') {
           if (authStatus.isAuthenticated()) {
             return <Redirect to="/users" />;
           }
@@ -27,7 +27,6 @@ AdvanceRoute.propTypes = {
   component: PropTypes.func.isRequired,
   authStatus: PropTypes.shape({
     isAuthenticated: PropTypes.func,
-    authenticate: PropTypes.func
   }),
   needAuthentication: PropTypes.bool.isRequired
 };

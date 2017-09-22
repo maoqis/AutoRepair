@@ -9,12 +9,28 @@ import NotFound from './components/NotFound';
 import Logout from './components/Logout';
 import Users from './components/Users';
 import Managers from './components/Managers';
+import RegisterUser from './components/RegisterUser';
 
 function Routes({ authStatus, restMethods }) {
   return (
     <Switch>
       <AdvanceRoute path="/" exact component={Home} authStatus={authStatus} needAuthentication />
-      <AdvanceRoute path="/login" exact component={Login} authStatus={authStatus} needAuthentication={false} />
+      <AdvanceRoute
+        path="/login"
+        exact
+        component={Login}
+        authStatus={authStatus}
+        restMethods={restMethods}
+        needAuthentication={false}
+      />
+      <AdvanceRoute
+        path="/registeruser"
+        exact
+        component={RegisterUser}
+        authStatus={authStatus}
+        restMethods={restMethods}
+        needAuthentication={false}
+      />
       <AdvanceRoute path="/logout" exact component={Logout} authStatus={authStatus} needAuthentication={false} />
       { authStatus.getRole() === 'manager' ?
         <AdvanceRoute path="/users" exact component={Users} authStatus={authStatus} restMethods={restMethods} needAuthentication /> : null }
@@ -29,7 +45,6 @@ function Routes({ authStatus, restMethods }) {
 Routes.propTypes = {
   authStatus: PropTypes.shape({
     isAuthenticated: PropTypes.func.isRequired,
-    authenticate: PropTypes.func.isRequired,
     getRole: PropTypes.func.isRequired
   }).isRequired,
   restMethods: PropTypes.shape({

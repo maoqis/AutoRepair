@@ -6,7 +6,6 @@ import './Login.css';
 class Login extends Component {
   constructor(props) {
     super(props);
-
     this.state = {
       username: '',
       password: '',
@@ -16,6 +15,12 @@ class Login extends Component {
 
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
+    this.validateForm = this.validateForm.bind(this);
+    this.toRegisterUser = this.toRegisterUser.bind(this);
+  }
+
+  toRegisterUser() {
+    this.props.history.push('/registeruser');
   }
 
   validateForm() {
@@ -36,7 +41,7 @@ class Login extends Component {
         show: true
       }
     );
-    this.props.authenticate(this.state.username, this.state.password)
+    this.props.restMethods.authenticate(this.state.username, this.state.password)
       .then(() => Promise.resolve())
       .catch(() => {
         this.setState({ loginInfo: 'login unsuccessful' });
@@ -73,6 +78,13 @@ class Login extends Component {
           >
             Login
           </Button>
+          <Button
+            block
+            bsSize="large"
+            onClick={() => this.toRegisterUser()}
+          >
+            Create Account
+          </Button>
         </form>
         <Modal show={this.state.show}>
           <Modal.Header>
@@ -88,7 +100,12 @@ class Login extends Component {
 }
 
 Login.propTypes = {
-  authenticate: PropTypes.func.isRequired
+  restMethods: PropTypes.shape({
+    authenticate: PropTypes.func
+  }).isRequired,
+  history: PropTypes.shape({
+    push: PropTypes.func
+  }).isRequired
 };
 
 export default Login;
