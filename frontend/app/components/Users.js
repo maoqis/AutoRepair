@@ -88,6 +88,7 @@ class Users extends React.Component {
         setTimeout(() => { this.closeEditUser(); }, 2000);
         return Promise.resolve();
       }).catch(() => {
+        //handle conflict username
         this.setState({
           saveButtonText: 'Not Saved'
         });

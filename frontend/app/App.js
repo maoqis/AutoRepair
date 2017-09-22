@@ -94,21 +94,8 @@ class App extends Component {
   authenticate(username, password) {
     // console.log(`Authenticate call with ${username} ${password}`);
     // console.log(`Login call with: ${LOGIN_URL}`);
-    return fetch(LOGIN_URL, {
-      method: 'post',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        username,
-        password
-      })
-    }).then((response) => {
-      if (response.ok) {
-        return response.json();
-      }
-      return Promise.reject(Error(response.status));
-    }).then((data) => {
+    return this.doWebRequestWithoutAuth(LOGIN_URL, 'post', {username, password})
+    .then((data) => {
       const bauthToken = `Basic ${btoa(`${username}:${password}`)}`;
       this.setState({
         isAuthenticated: true,
