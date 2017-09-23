@@ -1,6 +1,9 @@
 package com.sabbir.autorepair;
 
+import com.sabbir.autorepair.entity.RepairEntity;
 import com.sabbir.autorepair.entity.UserWithPassword;
+import com.sabbir.autorepair.model.Repair;
+import com.sabbir.autorepair.service.RepairService;
 import com.sabbir.autorepair.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -9,6 +12,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
@@ -26,6 +30,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter
 
 import javax.sql.DataSource;
 import java.util.Arrays;
+import java.util.logging.Logger;
 
 @SpringBootApplication(scanBasePackages = {"com.sabbir.autorepair"})
 public class Application {
@@ -36,20 +41,38 @@ public class Application {
 
 @Component
 class ApplicationLoader implements CommandLineRunner {
+    private static Logger logger = Logger.getLogger(CommandLineRunner.class.getName());
     @Autowired
     UserService userService;
 
+    @Autowired
+    RepairService repairService;
+
     @Override
-    public void run(String... args) throws Exception {
+    public void run(String... args) {
         final UserWithPassword manager = new UserWithPassword();
         manager.setUsername("sabbir");
         manager.setPassword("ahmed");
-        userService.createManager(manager);
+        if (userService.getUserByUsername("sabbir") == null)
+            userService.createManager(manager);
 
         final UserWithPassword user = new UserWithPassword();
         user.setUsername("user1");
         user.setPassword("123456");
-        userService.createUser(user);
+        if (userService.getUserByUsername("user1") == null)
+            userService.createUser(user);
+
+        final RepairEntity repairEntity = new RepairEntity();
+        repairEntity.setDateTime("2017-09-23 17:00");
+        repairEntity.setRepairName("repair x");
+        repairEntity.setDescription("Hello world");
+        repairEntity.setAssignedUserId(2L);
+        try {
+            final Repair repair = repairService.createRepair(repairEntity);
+            logger.info("Repair: " + repair.toString());
+        } catch (Exception ex) {
+
+        }
 
     }
 }
@@ -89,7 +112,11 @@ class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .authorizeRequests()
                 .antMatchers("/api/manager/**").hasAuthority("manager")
                 .antMatchers("/api/user/**").hasAuthority("manager")
-                .antMatchers("/api/ping").hasAnyAuthority("manager","user")
+                .antMatchers("/api/ping").hasAnyAuthority("manager", "user")
+                .antMatchers(HttpMethod.POST, "/api/repair").hasAuthority("manager")
+                .antMatchers(HttpMethod.GET, "/api/repair/**").hasAnyAuthority("manager", "user")
+                .antMatchers(HttpMethod.PUT, "/api/repair/**").hasAnyAuthority("manager", "user")
+                .antMatchers(HttpMethod.DELETE, "/api/repair/**").hasAnyAuthority("manager")
                 .and()
                 .httpBasic();
 
@@ -113,6 +140,7 @@ class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
     @Override
+    @Autowired
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
         auth.jdbcAuthentication()
                 .usersByUsernameQuery(usersQuery)
