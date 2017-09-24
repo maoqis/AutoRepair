@@ -1,5 +1,6 @@
 package com.sabbir.autorepair.controller;
 
+import com.sabbir.autorepair.entity.FilterRepairEntity;
 import com.sabbir.autorepair.entity.RepairEntity;
 import com.sabbir.autorepair.exception.TimeOverlapException;
 import com.sabbir.autorepair.exception.UserNotFoundException;
@@ -80,6 +81,13 @@ public class RepairController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         }
         return new ResponseEntity<Repair>(repair, HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "/filter", method = RequestMethod.POST)
+    public ResponseEntity<List<Repair>> searchRepair(@RequestBody FilterRepairEntity filterRepairEntity, Principal principal) {
+        final User currentUser = userService.getUserByUsername(principal.getName());
+        List<Repair> repairs = repairService.filterRepairByUser(filterRepairEntity, currentUser);
+        return new ResponseEntity<List<Repair>>(repairs, HttpStatus.OK);
     }
 
 }

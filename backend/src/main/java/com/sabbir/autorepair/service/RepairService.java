@@ -1,5 +1,6 @@
 package com.sabbir.autorepair.service;
 
+import com.sabbir.autorepair.entity.FilterRepairEntity;
 import com.sabbir.autorepair.entity.RepairEntity;
 import com.sabbir.autorepair.exception.TimeOverlapException;
 import com.sabbir.autorepair.exception.UserNotFoundException;
@@ -14,9 +15,12 @@ import org.springframework.stereotype.Service;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 @Service
 public class RepairService {
@@ -153,5 +157,54 @@ public class RepairService {
         }
         final Repair saveRepair = repairRepository.save(repair);
         return saveRepair;
+    }
+
+    public List<Repair> filterRepairByUser(FilterRepairEntity filter, User user) {
+        List<Repair> repairs = new ArrayList<>();
+        if (user.getRole().equals("manager")) {
+            repairs = repairRepository.findAll();
+        } else {
+            repairs = repairRepository.findByAssignedUserId(user.getId());
+        }
+        List<Repair> filteredRepairs = repairs.stream()
+                .filter(repair -> {
+                    if (filter.getAssignedUserId() == null || (filter.getAssignedUserId() == repair.getAssignedUserId()))
+                        return true;
+                    return false;
+                }).filter(repair -> {
+                    if (filter.getStatus() == null || filter.getStatus() == repair.getStatus())
+                        return true;
+                    return false;
+                }).filter(repair -> {
+                    if (filter.getDate() == null)
+                        return true;
+
+                    try {
+                        final Date filterDate = dateTimeFormat.parse(String.format("%s 00:00", filter.getDate()));
+                        final Calendar cal1 = Calendar.getInstance();
+                        final Calendar cal2 = Calendar.getInstance();
+                        cal1.setTime(filterDate);
+                        cal2.setTime(repair.getDateTime());
+                        return cal1.get(Calendar.YEAR) == cal2.get(Calendar.YEAR) &&
+                                cal1.get(Calendar.DAY_OF_YEAR) == cal2.get(Calendar.DAY_OF_YEAR);
+                    } catch (ParseException e) {
+                        return true;
+                    }
+                }).filter(repair -> {
+                    if (filter.getTime() == null)
+                        return true;
+                    try {
+                        final Date filterDate = dateTimeFormat.parse(String.format("2016-01-01 %s", filter.getTime()));
+                        final Calendar cal1 = Calendar.getInstance();
+                        final Calendar cal2 = Calendar.getInstance();
+                        cal1.setTime(filterDate);
+                        cal2.setTime(repair.getDateTime());
+                        return cal1.get(Calendar.HOUR_OF_DAY) == cal2.get(Calendar.HOUR_OF_DAY) &&
+                                cal1.get(Calendar.MINUTE) == cal2.get(Calendar.MINUTE);
+                    } catch (ParseException e) {
+                        return true;
+                    }
+                }).collect(Collectors.toList());
+        return filteredRepairs;
     }
 }
