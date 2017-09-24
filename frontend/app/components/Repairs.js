@@ -248,7 +248,10 @@ class Repairs extends React.Component {
   isStatusDisable() {
     if (this.state.isEditRepair === false) return false;
     if (this.state.isUser) {
-      if (this.state.currentEditRepair.status === 'complete') { return true; }
+      if (this.state.currentEditRepair.status === 'complete' ||
+        this.state.currentEditRepair.status === 'approve') {
+        return true;
+      }
     }
     return false;
   }
@@ -285,7 +288,7 @@ class Repairs extends React.Component {
                 <td>{repair.repairName}</td>
                 <td>{repair.dateTime}</td>
                 <td>{this.getUserNameFromId(repair.assignedUserId)}</td>
-                <td>{repair.status}</td>
+                <td>{repair.status === 'approve' ? 'need approval' : repair.status}</td>
               </tr>)
             )}
           </tbody>
@@ -348,7 +351,8 @@ class Repairs extends React.Component {
                     disabled={this.isStatusDisable()}
                   >
                     <option value="incomplete">Incomplete</option>
-                    <option value="complete">Complete</option>
+                    <option value="approve">Need Approval</option>
+                    {!this.state.isUser ? <option value="complete">Complete</option> : null}
                   </FormControl>
                 </FormGroup>
                 {

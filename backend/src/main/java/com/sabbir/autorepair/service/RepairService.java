@@ -124,10 +124,10 @@ public class RepairService {
             return null;
         }
         if (repairEntity.getStatus() != null && repairEntity.getStatus() != repair.getStatus()) {
-            if(user.getRole().equals("manager") || repairEntity.getStatus()== Repair.Status.COMPLETE)
+            if (user.getRole().equals("manager") || repairEntity.getStatus() == Repair.Status.APPROVE)
                 repair.setStatus(repairEntity.getStatus());
         }
-        if(user.getRole().equals("manager")) {
+        if (user.getRole().equals("manager")) {
             if (repairEntity.getRepairName() != null && !repairEntity.getRepairName().equals(repair.getRepairName())) {
                 repair.setRepairName(repairEntity.getRepairName());
             }

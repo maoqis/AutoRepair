@@ -92,6 +92,8 @@ public class Repair {
         @JsonProperty("complete")
         COMPLETE,
         @JsonProperty("incomplete")
-        INCOMPLETE
+        INCOMPLETE,
+        @JsonProperty("approve")
+        APPROVE
     }
 }
