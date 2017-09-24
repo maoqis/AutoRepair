@@ -117,6 +117,8 @@ class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers(HttpMethod.GET, "/api/repair/**").hasAnyAuthority("manager", "user")
                 .antMatchers(HttpMethod.PUT, "/api/repair/**").hasAnyAuthority("manager", "user")
                 .antMatchers(HttpMethod.DELETE, "/api/repair/**").hasAnyAuthority("manager")
+                .antMatchers(HttpMethod.POST, "/api/repair/{id}/comment").hasAnyAuthority("manager", "user")
+                .antMatchers(HttpMethod.GET, "/api/repair/{id}/comment").hasAnyAuthority("manager", "user")
                 .and()
                 .httpBasic();
 

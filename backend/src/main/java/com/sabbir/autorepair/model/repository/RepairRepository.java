@@ -7,6 +7,8 @@ import java.util.Date;
 import java.util.List;
 
 public interface RepairRepository extends JpaRepository<Repair, Long> {
+    Repair findRepairById(Long repairId);
+
     List<Repair> findByDateTimeBetween(Date timeStart, Date timeEnd);
 
     List<Repair> findByDateTime(Date dateTime);

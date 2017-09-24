@@ -1,9 +1,11 @@
 package com.sabbir.autorepair.controller;
 
+import com.sabbir.autorepair.entity.CommentEntity;
 import com.sabbir.autorepair.entity.FilterRepairEntity;
 import com.sabbir.autorepair.entity.RepairEntity;
 import com.sabbir.autorepair.exception.TimeOverlapException;
 import com.sabbir.autorepair.exception.UserNotFoundException;
+import com.sabbir.autorepair.model.Comment;
 import com.sabbir.autorepair.model.Repair;
 import com.sabbir.autorepair.model.User;
 import com.sabbir.autorepair.service.RepairService;
@@ -30,7 +32,6 @@ public class RepairController {
 
     @RequestMapping(method = RequestMethod.POST)
     public ResponseEntity<Repair> createRepair(@RequestBody RepairEntity repairEntity) {
-        logger.info(repairEntity.toString());
         final Repair repair;
         try {
             repair = repairService.createRepair(repairEntity);
@@ -88,6 +89,36 @@ public class RepairController {
         final User currentUser = userService.getUserByUsername(principal.getName());
         List<Repair> repairs = repairService.filterRepairByUser(filterRepairEntity, currentUser);
         return new ResponseEntity<List<Repair>>(repairs, HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "/{id}/comment", method = RequestMethod.POST)
+    public ResponseEntity<Comment> createComment(@PathVariable(name = "id") Long repairId, @RequestBody CommentEntity commentEntity, Principal principal) {
+        final User currentUser = userService.getUserByUsername(principal.getName());
+        final Comment comment = repairService.createCommentByUser(repairId, commentEntity, currentUser);
+        if (comment == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
+        return new ResponseEntity<Comment>(comment, HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "/{id}/comment", method = RequestMethod.GET)
+    public ResponseEntity<List<Comment>> getComments(@PathVariable(name = "id") Long repairId, Principal principal) {
+        final User currentUser = userService.getUserByUsername(principal.getName());
+        final List<Comment> comments = repairService.getCommentsOfRepairByUser(repairId, currentUser);
+        if (comments == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
+        return new ResponseEntity<>(comments, HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "/{repairId}/comment/{commentId}", method = RequestMethod.DELETE)
+    public ResponseEntity<Comment> deleteComment(@PathVariable Long repairId, @PathVariable Long commentId, Principal principal) {
+        final User currentUser = userService.getUserByUsername(principal.getName());
+        final Comment comment = repairService.deleteCommentOfRepairByUser(repairId, commentId, currentUser);
+        if (comment == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
+        return new ResponseEntity<Comment>(comment, HttpStatus.OK);
     }
 
 }

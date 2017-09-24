@@ -1,11 +1,14 @@
 package com.sabbir.autorepair.service;
 
+import com.sabbir.autorepair.entity.CommentEntity;
 import com.sabbir.autorepair.entity.FilterRepairEntity;
 import com.sabbir.autorepair.entity.RepairEntity;
 import com.sabbir.autorepair.exception.TimeOverlapException;
 import com.sabbir.autorepair.exception.UserNotFoundException;
+import com.sabbir.autorepair.model.Comment;
 import com.sabbir.autorepair.model.Repair;
 import com.sabbir.autorepair.model.User;
+import com.sabbir.autorepair.model.repository.CommentRepository;
 import com.sabbir.autorepair.model.repository.RepairRepository;
 import com.sabbir.autorepair.model.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +33,9 @@ public class RepairService {
     private RepairRepository repairRepository;
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private CommentRepository commentRepository;
+
     private DateFormat dateTimeFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
 
     public Repair createRepair(RepairEntity repairEntity) throws TimeOverlapException, UserNotFoundException {
@@ -96,7 +102,7 @@ public class RepairService {
     }
 
     public Repair getRepairByUser(Long repairId, User user) {
-        Repair repair = repairRepository.findOne(repairId);
+        Repair repair = repairRepository.findRepairById(repairId);
         if (repair != null) {
             if (user.getRole().equals("manager"))
                 return repair;
@@ -121,7 +127,7 @@ public class RepairService {
     public Repair updateRepairByUser(Long repairId, RepairEntity repairEntity, User user) throws TimeOverlapException {
         if (repairEntity.getId() == null || repairEntity.getId() != repairId)
             return null;
-        final Repair repair = repairRepository.findOne(repairId);
+        final Repair repair = repairRepository.findRepairById(repairId);
         if (repair == null) return null;
         if (!user.getRole().equals("manager") &&
                 (repair.getAssignedUserId() == null || user.getId() != repair.getAssignedUserId())) {
@@ -206,5 +212,51 @@ public class RepairService {
                     }
                 }).collect(Collectors.toList());
         return filteredRepairs;
+    }
+
+    //Comments sections
+    public Comment createCommentByUser(Long repairId, CommentEntity commentEntity, User user) {
+        if (commentEntity.getRepairId() == null
+                || repairId != commentEntity.getRepairId())
+            return null;
+        if (user == null) return null;
+        final Repair repair = repairRepository.findRepairById(commentEntity.getRepairId());
+        if (repair == null) return null;
+        if (!user.getRole().equals("manager") && repair.getAssignedUserId() != user.getId())
+            return null;
+        final Comment comment = new Comment();
+        comment.setRepairId(repair.getId());
+        comment.setUserId(user.getId());
+        try {
+            if (commentEntity.getDateTime() != null)
+                comment.setDateTime(dateTimeFormat.parse(commentEntity.getDateTime()));
+            else comment.setDateTime(new Date());
+        } catch (ParseException e) {
+            logger.info("Time format is invalid: " + commentEntity.getDateTime());
+            comment.setDateTime(new Date());
+        }
+        comment.setComment(commentEntity.getComment());
+        final Comment savedComment = commentRepository.save(comment);
+        return savedComment;
+    }
+
+    public List<Comment> getCommentsOfRepairByUser(Long repairId, User user) {
+        final Repair repair = repairRepository.findRepairById(repairId);
+        if (repair == null) return null;
+        if (!user.getRole().equals("manager") && repair.getAssignedUserId() != user.getId())
+            return null;
+        return commentRepository.getCommentsByRepairId(repairId);
+    }
+
+    public Comment deleteCommentOfRepairByUser(Long repairId, Long commentId, User user) {
+        final Repair repair = repairRepository.findRepairById(repairId);
+        if (repair == null) return null;
+        final Comment comment = commentRepository.findCommentById(commentId);
+        if (comment == null) return null;
+        if (!user.getRole().equals("manager") && repair.getAssignedUserId() != user.getId())
+            return null;
+        commentRepository.delete(commentId);
+        comment.setId(null);
+        return comment;
     }
 }
