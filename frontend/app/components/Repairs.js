@@ -9,6 +9,7 @@ class Repairs extends React.Component {
     super(props);
     this.state = {
       userList: [],
+      userIdNameMap: {},
       repairList: [],
       showEditRepair: false,
       saveButtonText: 'Save',
@@ -41,6 +42,7 @@ class Repairs extends React.Component {
     this.isStatusDisable = this.isStatusDisable.bind(this);
     this.deleteRepair = this.deleteRepair.bind(this);
     this.parseDateString = this.parseDateString.bind(this);
+    this.getUserNameFromId = this.getUserNameFromId.bind(this);
   }
 
   componentWillMount() {
@@ -49,10 +51,22 @@ class Repairs extends React.Component {
   }
 
   getUsers() {
-    if (this.state.isUser) return;
+    if (this.state.isUser) {
+      const currentUser = this.props.getCurrentUser();
+      const users = [currentUser];
+      const userIdNameMap = {};
+      userIdNameMap[currentUser.id] = currentUser.username;
+      this.setState({ userList: users, userIdNameMap });
+      return;
+    }
     this.props.restMethods.getUsers()
       .then((users) => {
-        this.setState({ userList: users });
+        let userIdNameMap = this.state.userIdNameMap;
+        userIdNameMap = {};
+        users.forEach((user) => {
+          userIdNameMap[user.id] = user.username;
+        });
+        this.setState({ userList: users, userIdNameMap });
         return Promise.resolve();
       }).catch(() => {});
   }
@@ -239,6 +253,14 @@ class Repairs extends React.Component {
     return false;
   }
 
+  getUserNameFromId(userId) {
+    if (userId === null) return 'None';
+    const userIdNameMap = this.state.userIdNameMap;
+    const username = userIdNameMap[userId];
+    if (username !== null) return username;
+    return userId;
+  }
+
   render() {
     return (
       <div>
@@ -262,7 +284,7 @@ class Repairs extends React.Component {
                 <td>{repair.id}</td>
                 <td>{repair.repairName}</td>
                 <td>{repair.dateTime}</td>
-                <td>{repair.assignedUserId}</td>
+                <td>{this.getUserNameFromId(repair.assignedUserId)}</td>
                 <td>{repair.status}</td>
               </tr>)
             )}
@@ -378,6 +400,7 @@ Repairs.propTypes = {
     getUsers: PropTypes.func.isRequired,
     deleteRepair: PropTypes.func.isRequired
   }).isRequired,
-  getRole: PropTypes.func.isRequired
+  getRole: PropTypes.func.isRequired,
+  getCurrentUser: PropTypes.func.isRequired
 };
 export default Repairs;

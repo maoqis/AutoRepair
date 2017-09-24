@@ -16,9 +16,11 @@ class App extends Component {
       isAuthenticated: false,
       basicAuthToken: '',
       role: '',
+      currentUser: null
     };
     this.authenticate = this.authenticate.bind(this);
     this.isAuthenticated = this.isAuthenticated.bind(this);
+    this.getCurrentUser = this.getCurrentUser.bind(this);
     this.logout = this.logout.bind(this);
     this.getRole = this.getRole.bind(this);
     this.getUsers = this.getUsers.bind(this);
@@ -45,10 +47,12 @@ class App extends Component {
     const token = this.getCookie('basicAuthToken');
     if (token) {
       const userRole = this.getCookie('role');
+      const user = JSON.parse(this.getCookie('currentUser'));
       this.setState({
         isAuthenticated: true,
         basicAuthToken: token,
-        role: userRole
+        role: userRole,
+        currentUser: user
       });
 
       fetch(PING_URL, {
@@ -100,15 +104,18 @@ class App extends Component {
     // console.log(`Authenticate call with ${username} ${password}`);
     // console.log(`Login call with: ${LOGIN_URL}`);
     return this.doWebRequestWithoutAuth(LOGIN_URL, 'post', { username, password })
-      .then((data) => {
+      .then((user) => {
         const bauthToken = `Basic ${btoa(`${username}:${password}`)}`;
         this.setState({
           isAuthenticated: true,
           basicAuthToken: bauthToken,
-          role: data.role
+          role: user.role,
+          currentUser: user
         });
+        const currentUserStr = JSON.stringify(user);
         this.setCookie('basicAuthToken', bauthToken, 1);
-        this.setCookie('role', data.role, 1);
+        this.setCookie('role', user.role, 1);
+        this.setCookie('currentUser', currentUserStr, 1);
         return Promise.resolve();
       });
   }
@@ -139,6 +146,10 @@ class App extends Component {
 
   isAuthenticated() {
     return this.state.isAuthenticated;
+  }
+
+  getCurrentUser() {
+    return this.state.currentUser;
   }
 
   getManagers() {
@@ -222,7 +233,8 @@ class App extends Component {
     const authStatus = {
       isAuthenticated: this.isAuthenticated,
       logout: this.logout,
-      getRole: this.getRole
+      getRole: this.getRole,
+      getCurrentUser: this.getCurrentUser
     };
 
     const restMethods = {
