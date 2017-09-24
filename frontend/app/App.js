@@ -3,7 +3,8 @@ import Routes from './Routes';
 
 import { LOGIN_URL, GET_USERS_URL, PING_URL, DELETE_USER_URL, UPDATE_USER_URL,
   CREATE_USER_URL, GET_MANAGERS_URL, DELETE_MANAGER_URL, UPDATE_MANAGER_URL,
-  CREATE_MANAGER_URL, REGISTER_USER_URL } from './Constants';
+  CREATE_MANAGER_URL, REGISTER_USER_URL, GET_REPAIRS_URL, CREATE_REPAIR_URL,
+  UPDATE_REPAIR_URL } from './Constants';
 import RouteNavBar from './components/RouteNavBar';
 import './App.css';
 
@@ -31,6 +32,9 @@ class App extends Component {
     this.updateManager = this.updateManager.bind(this);
     this.createManager = this.createManager.bind(this);
     this.registerUser = this.registerUser.bind(this);
+    this.getRepairs = this.getRepairs.bind(this);
+    this.createRepair = this.createRepair.bind(this);
+    this.updateRepair = this.updateRepair.bind(this);
 
     this.doWebRequest = this.doWebRequest.bind(this);
     this.doWebRequestWithoutAuth = this.doWebRequestWithoutAuth.bind(this);
@@ -94,18 +98,18 @@ class App extends Component {
   authenticate(username, password) {
     // console.log(`Authenticate call with ${username} ${password}`);
     // console.log(`Login call with: ${LOGIN_URL}`);
-    return this.doWebRequestWithoutAuth(LOGIN_URL, 'post', {username, password})
-    .then((data) => {
-      const bauthToken = `Basic ${btoa(`${username}:${password}`)}`;
-      this.setState({
-        isAuthenticated: true,
-        basicAuthToken: bauthToken,
-        role: data.role
+    return this.doWebRequestWithoutAuth(LOGIN_URL, 'post', { username, password })
+      .then((data) => {
+        const bauthToken = `Basic ${btoa(`${username}:${password}`)}`;
+        this.setState({
+          isAuthenticated: true,
+          basicAuthToken: bauthToken,
+          role: data.role
+        });
+        this.setCookie('basicAuthToken', bauthToken, 1);
+        this.setCookie('role', data.role, 1);
+        return Promise.resolve();
       });
-      this.setCookie('basicAuthToken', bauthToken, 1);
-      this.setCookie('role', data.role, 1);
-      return Promise.resolve();
-    });
   }
 
   registerUser(username, password) {
@@ -168,6 +172,18 @@ class App extends Component {
     return this.doWebRequest(CREATE_USER_URL, 'post', { username, password });
   }
 
+  getRepairs() {
+    return this.doWebRequest(GET_REPAIRS_URL, 'get');
+  }
+
+  createRepair(repair) {
+    return this.doWebRequest(CREATE_REPAIR_URL, 'post', repair);
+  }
+
+  updateRepair(repair) {
+    return this.doWebRequest(`${UPDATE_REPAIR_URL}/${repair.id}`, 'put', repair);
+  }
+
   doWebRequest(url, method, body) {
     return fetch(url, {
       method,
@@ -214,7 +230,10 @@ class App extends Component {
       updateManager: this.updateManager,
       createManager: this.createManager,
       authenticate: this.authenticate,
-      registerUser: this.registerUser
+      registerUser: this.registerUser,
+      getRepairs: this.getRepairs,
+      createRepair: this.createRepair,
+      updateRepair: this.updateRepair
     };
     return (
       <div className="App container">

@@ -89,7 +89,7 @@ class Managers extends React.Component {
         setTimeout(() => { this.closeEditManager(); }, 2000);
         return Promise.resolve();
       }).catch(() => {
-        //todo handle conflict username
+        // todo handle conflict username
         this.setState({
           saveButtonText: 'Not Saved'
         });

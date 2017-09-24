@@ -1,0 +1,16 @@
+.table th{
+  text-align: center;
+  cursor: default;
+}
+
+.table tr{
+  cursor: pointer;
+}
+
+.buttonBar {
+  margin-bottom: 10px;
+}
+
+.alert {
+  margin-top: 10px;
+}

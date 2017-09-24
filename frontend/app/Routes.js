@@ -10,6 +10,7 @@ import Logout from './components/Logout';
 import Users from './components/Users';
 import Managers from './components/Managers';
 import RegisterUser from './components/RegisterUser';
+import Repairs from './components/Repairs';
 
 function Routes({ authStatus, restMethods }) {
   return (
@@ -36,7 +37,7 @@ function Routes({ authStatus, restMethods }) {
         <AdvanceRoute path="/users" exact component={Users} authStatus={authStatus} restMethods={restMethods} needAuthentication /> : null }
       { authStatus.getRole() === 'manager' ?
         <AdvanceRoute path="/managers" exact component={Managers} authStatus={authStatus} restMethods={restMethods} needAuthentication /> : null }
-      <AdvanceRoute path="/repairs" exact component={NotFound} authStatus={authStatus} needAuthentication />
+      <AdvanceRoute path="/repairs" exact component={Repairs} authStatus={authStatus} restMethods={restMethods} needAuthentication />
       <Route component={NotFound} />
     </Switch>
   );

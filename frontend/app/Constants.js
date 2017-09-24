@@ -13,4 +13,9 @@ export const DELETE_MANAGER_URL = `${GET_MANAGERS_URL}`;
 export const UPDATE_MANAGER_URL = `${GET_MANAGERS_URL}`;
 export const CREATE_MANAGER_URL = `${GET_MANAGERS_URL}`;
 
+export const GET_REPAIRS_URL = `${REST_SERVER_BASE_URL}/repair`;
+export const DELETE_REPAIR_URL = `${GET_REPAIRS_URL}`;
+export const UPDATE_REPAIR_URL = `${GET_REPAIRS_URL}`;
+export const CREATE_REPAIR_URL = `${GET_REPAIRS_URL}`;
+
 export const PING_URL = `${REST_SERVER_BASE_URL}/ping`;
