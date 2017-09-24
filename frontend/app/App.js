@@ -4,7 +4,7 @@ import Routes from './Routes';
 import { LOGIN_URL, GET_USERS_URL, PING_URL, DELETE_USER_URL, UPDATE_USER_URL,
   CREATE_USER_URL, GET_MANAGERS_URL, DELETE_MANAGER_URL, UPDATE_MANAGER_URL,
   CREATE_MANAGER_URL, REGISTER_USER_URL, GET_REPAIRS_URL, CREATE_REPAIR_URL,
-  UPDATE_REPAIR_URL } from './Constants';
+  UPDATE_REPAIR_URL, DELETE_REPAIR_URL } from './Constants';
 import RouteNavBar from './components/RouteNavBar';
 import './App.css';
 
@@ -35,6 +35,7 @@ class App extends Component {
     this.getRepairs = this.getRepairs.bind(this);
     this.createRepair = this.createRepair.bind(this);
     this.updateRepair = this.updateRepair.bind(this);
+    this.deleteRepair = this.deleteRepair.bind(this);
 
     this.doWebRequest = this.doWebRequest.bind(this);
     this.doWebRequestWithoutAuth = this.doWebRequestWithoutAuth.bind(this);
@@ -184,6 +185,10 @@ class App extends Component {
     return this.doWebRequest(`${UPDATE_REPAIR_URL}/${repair.id}`, 'put', repair);
   }
 
+  deleteRepair(repairId) {
+    return this.doWebRequest(`${DELETE_REPAIR_URL}/${repairId}`, 'delete');
+  }
+
   doWebRequest(url, method, body) {
     return fetch(url, {
       method,
@@ -233,7 +238,8 @@ class App extends Component {
       registerUser: this.registerUser,
       getRepairs: this.getRepairs,
       createRepair: this.createRepair,
-      updateRepair: this.updateRepair
+      updateRepair: this.updateRepair,
+      deleteRepair: this.deleteRepair
     };
     return (
       <div className="App container">

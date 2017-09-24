@@ -39,6 +39,8 @@ class Repairs extends React.Component {
     this.closeCreateRepair = this.closeCreateRepair.bind(this);
     this.createRepair = this.createRepair.bind(this);
     this.isStatusDisable = this.isStatusDisable.bind(this);
+    this.deleteRepair = this.deleteRepair.bind(this);
+    this.parseDateString = this.parseDateString.bind(this);
   }
 
   componentWillMount() {
@@ -63,7 +65,7 @@ class Repairs extends React.Component {
       }).catch(() => {});
   }
 
-  createRepair() {
+  parseDateString() {
     const dateTime = new Date(this.state.repairDateTime);
     let day = String(dateTime.getDate());
     let month = `${dateTime.getMonth() + 1}`;
@@ -84,7 +86,16 @@ class Repairs extends React.Component {
       minute = `0${minute}`;
     }
     const fullDate = `${year}-${month}-${day} ${hour}:${minute}`;
-    this.props.restMethods.createRepair({
+    return fullDate;
+  }
+
+  createRepair(isUpdate) {
+    const fullDate = this.parseDateString();
+    const method = isUpdate ? this.props.restMethods.updateRepair :
+      this.props.restMethods.createRepair;
+    const cId = isUpdate ? this.state.currentEditRepair.id : -1;
+    method({
+      id: cId,
       repairName: this.state.repairName,
       description: this.state.repairDescription,
       dateTime: fullDate,
@@ -94,7 +105,7 @@ class Repairs extends React.Component {
     })
       .then(() => {
         this.setState({
-          saveButtonText: 'Repair Created'
+          saveButtonText: isUpdate ? 'Repair Updated' : 'Repair Created'
         });
         this.getRepairs();
         setTimeout(() => { this.closeCreateRepair(); }, 1000);
@@ -105,52 +116,11 @@ class Repairs extends React.Component {
             saveButtonText: 'Time Overlap',
             saveButtonClickable: true,
           });
-        }
-      });
-  }
-
-  updateRepair() {
-    const dateTime = new Date(this.state.repairDateTime);
-    let day = String(dateTime.getDate());
-    let month = String(dateTime.getMonth() + 1);
-    const year = String(dateTime.getFullYear());
-    let hour = String(dateTime.getHours());
-    let minute = String(dateTime.getMinutes());
-
-    if (day.length < 2) {
-      day = `0${day}`;
-    }
-    if (month.length < 2) {
-      month = `0${month}`;
-    }
-    if (hour.length < 2) {
-      hour = `0${hour}`;
-    }
-    if (minute.length < 2) {
-      minute = `0${minute}`;
-    }
-    const fullDate = `${year}-${month}-${day} ${hour}:${minute}`;
-    this.props.restMethods.updateRepair({
-      id: this.state.currentEditRepair.id,
-      repairName: this.state.repairName,
-      description: this.state.repairDescription,
-      dateTime: fullDate,
-      status: this.state.status,
-      assignedUserId: parseInt(this.state.assignedUserId, 10) !== -1 ?
-        parseInt(this.state.assignedUserId, 10) : null
-    })
-      .then(() => {
-        this.setState({
-          saveButtonText: 'Repair Updated'
-        });
-        this.getRepairs();
-        setTimeout(() => { this.closeCreateRepair(); }, 1000);
-        return Promise.resolve();
-      }).catch((status) => {
-        if (status.message === '409') {
-          this.setState({
-            saveButtonText: 'Time Overlap',
-            saveButtonClickable: true,
+        } else {
+          this.setstate({
+            savebuttontext: isUpdate ? 'unable to update' : 'unable to create',
+            savebuttonclickable: true,
+            deletebuttonclickable: true
           });
         }
       });
@@ -177,27 +147,39 @@ class Repairs extends React.Component {
     });
   }
 
-  /*
-  deleteRepair(userId) {
 
-  } */
+  deleteRepair() {
+    this.setState({
+      deleteButtonClickable: false,
+      saveButtonClickable: false,
+      deleteButtonText: 'Deleting'
+    });
+    this.props.restMethods.deleteRepair(this.state.currentEditRepair.id)
+      .then(() => {
+        this.setState({
+          deleteButtonText: 'Deleted Successfully'
+        });
+        this.getRepairs();
+        setTimeout(() => { this.closeCreateRepair(); }, 1000);
+        return Promise.resolve();
+      }).catch(() => {
+        this.setState({
+          deleteButtonText: 'Unable to Delete'
+        });
+        this.getRepairs();
+        setTimeout(() => { this.closeCreateRepair(); }, 1000);
+      });
+  }
 
   handleCreateRepairSubmit(event) {
     event.preventDefault();
 
-    if (this.state.isEditRepair) {
-      this.setState({
-        saveButtonClickable: false,
-        saveButtonText: 'Updating...',
-      });
-      this.updateRepair();
-    } else {
-      this.setState({
-        saveButtonClickable: false,
-        saveButtonText: 'Creating...',
-      });
-      this.createRepair();
-    }
+    this.setState({
+      deleteButtonClickable: false,
+      saveButtonClickable: false,
+      saveButtonText: this.state.isEditRepair ? 'Updating...' : 'Creating...',
+    });
+    this.createRepair(this.state.isEditRepair);
   }
 
   handleCreateRepairChange(event) {
@@ -243,7 +225,9 @@ class Repairs extends React.Component {
       saveButtonText: 'Update',
       dateIsValid: true,
       isEditRepair: true,
-      currentEditRepair: repair
+      currentEditRepair: repair,
+      deleteButtonClickable: true,
+      deleteButtonText: 'Delete'
     });
   }
 
@@ -286,7 +270,7 @@ class Repairs extends React.Component {
         </Table>
         <Modal show={this.state.showCreateRepair} onHide={this.closeCreateRepair}>
           <Modal.Header closeButton>
-            <Modal.Title>New Repair</Modal.Title>
+            <Modal.Title>{this.state.isEditRepair ? 'Edit Repair' : 'New Repair'}</Modal.Title>
           </Modal.Header>
           <Modal.Body>
             <div className="Edit">
@@ -345,6 +329,15 @@ class Repairs extends React.Component {
                     <option value="complete">Complete</option>
                   </FormControl>
                 </FormGroup>
+                {
+                  this.state.isEditRepair ?
+                    (<Button
+                      block
+                      bsSize="large"
+                    >
+                  Comments
+                    </Button>) : null
+                }
                 <Button
                   block
                   bsSize="large"
@@ -353,6 +346,18 @@ class Repairs extends React.Component {
                 >
                   {this.state.saveButtonText}
                 </Button>
+                {
+                  (!this.state.isUser && this.state.isEditRepair) ?
+                    (<Button
+                      block
+                      bsStyle="danger"
+                      bsSize="large"
+                      disabled={!this.state.deleteButtonClickable}
+                      onClick={() => this.deleteRepair()}
+                    >
+                      {this.state.deleteButtonText}
+                    </Button>) : null
+                }
               </form>
               {this.state.validateionMessage.length > 0 ? (<Alert bsStyle="danger" className="alert">
                 {this.state.validateionMessage}
@@ -370,7 +375,8 @@ Repairs.propTypes = {
     getRepairs: PropTypes.func.isRequired,
     updateRepair: PropTypes.func.isRequired,
     createRepair: PropTypes.func.isRequired,
-    getUsers: PropTypes.func.isRequired
+    getUsers: PropTypes.func.isRequired,
+    deleteRepair: PropTypes.func.isRequired
   }).isRequired,
   getRole: PropTypes.func.isRequired
 };
