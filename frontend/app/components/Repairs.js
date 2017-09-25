@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Table, Button, Modal, FormGroup, FormControl, ControlLabel, ButtonToolbar, Alert } from 'react-bootstrap';
+import { Table, Button, Modal, FormGroup, FormControl, ControlLabel, ButtonToolbar, Alert, Form } from 'react-bootstrap';
 
 import './Repairs.css';
 
@@ -11,6 +11,7 @@ class Repairs extends React.Component {
       userList: [],
       userIdNameMap: {},
       repairList: [],
+      filterredRepairList: [],
       showEditRepair: false,
       saveButtonText: 'Save',
       saveButtonClickable: false,
@@ -28,7 +29,12 @@ class Repairs extends React.Component {
 
       isEditRepair: false,
       currentEditRepair: null,
-      isUser: props.getRole() === 'user'
+      isUser: props.getRole() === 'user',
+
+      filterDate: '',
+      filterTime: '',
+      filterUser: '',
+      filterStatus: 'all'
     };
 
     this.showEditRepair = this.showEditRepair.bind(this);
@@ -43,6 +49,9 @@ class Repairs extends React.Component {
     this.deleteRepair = this.deleteRepair.bind(this);
     this.parseDateString = this.parseDateString.bind(this);
     this.getUserNameFromId = this.getUserNameFromId.bind(this);
+
+    this.filterRepair = this.filterRepair.bind(this);
+    this.handlerFilterInputChange = this.handlerFilterInputChange.bind(this);
   }
 
   componentWillMount() {
@@ -67,6 +76,7 @@ class Repairs extends React.Component {
           userIdNameMap[user.id] = user.username;
         });
         this.setState({ userList: users, userIdNameMap });
+
         return Promise.resolve();
       }).catch(() => {});
   }
@@ -75,8 +85,40 @@ class Repairs extends React.Component {
     this.props.restMethods.getRepairs()
       .then((repairs) => {
         this.setState({ repairList: repairs });
+        this.filterRepair(repairs);
         return Promise.resolve();
       }).catch(() => {});
+  }
+
+  filterRepair(repairList, event) {
+    const filterredList = repairList.filter((repair) => {
+      let filterUser = this.state.filterUser;
+      if (event && event.target.id === 'filterUser') { filterUser = event.target.value; }
+      if (filterUser.length === 0) return true;
+      if (this.state.userIdNameMap[repair.assignedUserId]) {
+        return this.state.userIdNameMap[repair.assignedUserId].startsWith(filterUser);
+      }
+      return false;
+    }).filter((repair) => {
+      let filterStatus = this.state.filterStatus;
+      if (event && event.target.id === 'filterStatus') { filterStatus = event.target.value; }
+      if (filterStatus === 'all') return true;
+      return repair.status === filterStatus;
+    }).filter((repair) => {
+      let filterDate = this.state.filterDate;
+      if (event && event.target.id === 'filterDate') { filterDate = event.target.value; }
+      if (filterDate.length === 0) return true;
+      return repair.dateTime.startsWith(filterDate);
+    }).filter((repair) => {
+      let filterTime = this.state.filterTime;
+      if (event && event.target.id === 'filterTime') { filterTime = event.target.value; }
+      if (filterTime.length === 0) return true;
+      return repair.dateTime.split(' ')[1].startsWith(filterTime);
+    });
+
+    this.setState({
+      filterredRepairList: filterredList
+    });
   }
 
   parseDateString() {
@@ -131,7 +173,7 @@ class Repairs extends React.Component {
             saveButtonClickable: true,
           });
         } else {
-          this.setstate({
+          this.setState({
             savebuttontext: isUpdate ? 'unable to update' : 'unable to create',
             savebuttonclickable: true,
             deletebuttonclickable: true
@@ -202,7 +244,7 @@ class Repairs extends React.Component {
       saveButtonText: this.state.isEditRepair ? 'Update' : 'Create'
     });
     if (event.target.id === 'repairDateTime') {
-      this.validateDateTime();
+      this.validateDateTime(event);
     }
   }
 
@@ -212,9 +254,10 @@ class Repairs extends React.Component {
     return this.state.repairName.length > 0 && this.state.dateIsValid;
   }
 
-  validateDateTime() {
-    const datetime = new Date(this.state.repairDateTime);
-    if (this.state.repairDateTime.length === 0 || isNaN(datetime.getTime())) {
+  validateDateTime(event) {
+    const repairDateTime = event.target.value;
+    const datetime = new Date(repairDateTime);
+    if (repairDateTime.length === 0 || isNaN(datetime.getTime())) {
       this.setState({
         validateionMessage: 'Date is invalid',
         dateIsValid: false
@@ -264,6 +307,14 @@ class Repairs extends React.Component {
     return userId;
   }
 
+
+  handlerFilterInputChange(event) {
+    this.filterRepair(this.state.repairList, event);
+    this.setState({
+      [event.target.id]: event.target.value
+    });
+  }
+
   render() {
     return (
       <div>
@@ -271,6 +322,29 @@ class Repairs extends React.Component {
           (<ButtonToolbar>
             <Button bsStyle="primary" className="buttonBar" onClick={this.showCreateRepair}>Create New Repair</Button>
           </ButtonToolbar>) }
+        <Form inline>
+          <FormGroup controlId="filterDate">
+            <FormControl type="text" placeholder="Date (yyyy-mm-dd)" onChange={this.handlerFilterInputChange} />
+          </FormGroup>
+          {' '}
+          <FormGroup controlId="filterTime">
+            <FormControl type="text" placeholder="Time (hh:mm)" onChange={this.handlerFilterInputChange} />
+          </FormGroup>
+          {' '}
+          { this.state.isUser ? null : (
+            <FormGroup controlId="filterUser">
+              <FormControl type="text" placeholder="Assigned User" onChange={this.handlerFilterInputChange} />
+            </FormGroup>)}
+          {' '}
+          <FormGroup controlId="filterStatus">
+            <FormControl componentClass="select" value={this.state.filterStatus} onChange={this.handlerFilterInputChange}>
+              <option value="all">Status</option>
+              <option value="incomplete">Incomplete</option>
+              <option value="approve">Need Approval</option>
+              <option value="complete">Complete</option>
+            </FormControl>
+          </FormGroup>
+        </Form>
         <Table striped bordered hover>
           <thead>
             <tr>
@@ -282,7 +356,7 @@ class Repairs extends React.Component {
             </tr>
           </thead>
           <tbody >
-            { this.state.repairList.map((repair) =>
+            { this.state.filterredRepairList.map((repair) =>
               (<tr key={repair.id} onClick={() => { this.showEditRepair(repair); }}>
                 <td>{repair.id}</td>
                 <td>{repair.repairName}</td>
