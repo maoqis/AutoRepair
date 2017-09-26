@@ -38,6 +38,9 @@ class App extends Component {
     this.createRepair = this.createRepair.bind(this);
     this.updateRepair = this.updateRepair.bind(this);
     this.deleteRepair = this.deleteRepair.bind(this);
+    this.getComments = this.getComments.bind(this);
+    this.createComment = this.createComment.bind(this);
+    this.getAllUser = this.getAllUser.bind(this);
 
     this.doWebRequest = this.doWebRequest.bind(this);
     this.doWebRequestWithoutAuth = this.doWebRequestWithoutAuth.bind(this);
@@ -200,6 +203,18 @@ class App extends Component {
     return this.doWebRequest(`${DELETE_REPAIR_URL}/${repairId}`, 'delete');
   }
 
+  getComments(repairId) {
+    return this.doWebRequest(`${GET_REPAIRS_URL}/${repairId}/comment`, 'get');
+  }
+
+  createComment(repairId, commentText) {
+    return this.doWebRequest(`${GET_REPAIRS_URL}/${repairId}/comment`, 'post', { repairId, comment: commentText });
+  }
+
+  getAllUser() {
+    return this.doWebRequest(`${GET_USERS_URL}/all`, 'get');
+  }
+
   doWebRequest(url, method, body) {
     return fetch(url, {
       method,
@@ -251,7 +266,10 @@ class App extends Component {
       getRepairs: this.getRepairs,
       createRepair: this.createRepair,
       updateRepair: this.updateRepair,
-      deleteRepair: this.deleteRepair
+      deleteRepair: this.deleteRepair,
+      getComments: this.getComments,
+      createComment: this.createComment,
+      getAllUser: this.getAllUser
     };
     return (
       <div className="App container">

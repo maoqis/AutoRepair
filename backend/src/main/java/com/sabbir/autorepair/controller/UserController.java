@@ -82,6 +82,11 @@ public class UserController {
             return new ResponseEntity<User>(existingUser, HttpStatus.OK);
         }
     }
+
+    @RequestMapping(value = "/all", method = RequestMethod.GET)
+    public ResponseEntity<List<User>> getAllUserAndManager() {
+        return new ResponseEntity<List<User>>(userService.getAllUserAndManager(), HttpStatus.OK);
+    }
 }
 
 

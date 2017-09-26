@@ -100,4 +100,8 @@ public class UserService {
         return false;
     }
 
+    public List<User> getAllUserAndManager() {
+        return userRepository.findAll();
+    }
+
 }

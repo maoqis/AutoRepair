@@ -111,6 +111,7 @@ class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .authorizeRequests()
                 .antMatchers("/api/manager/**").hasAuthority("manager")
+                .antMatchers(HttpMethod.GET, "/api/user/all").hasAnyAuthority("manager", "user")
                 .antMatchers("/api/user/**").hasAuthority("manager")
                 .antMatchers("/api/ping").hasAnyAuthority("manager", "user")
                 .antMatchers(HttpMethod.POST, "/api/repair").hasAuthority("manager")

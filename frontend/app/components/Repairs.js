@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Table, Button, Modal, FormGroup, FormControl, ControlLabel, ButtonToolbar, Alert, Form } from 'react-bootstrap';
+import { Table, Button, Modal, FormGroup, FormControl, ControlLabel, ButtonToolbar, Alert, Form, Panel } from 'react-bootstrap';
 
 import './Repairs.css';
 
@@ -34,7 +34,11 @@ class Repairs extends React.Component {
       filterDate: '',
       filterTime: '',
       filterUser: '',
-      filterStatus: 'all'
+      filterStatus: 'all',
+
+      showCommentView: false,
+      comments: [],
+      commentText: ''
     };
 
     this.showEditRepair = this.showEditRepair.bind(this);
@@ -52,6 +56,10 @@ class Repairs extends React.Component {
 
     this.filterRepair = this.filterRepair.bind(this);
     this.handlerFilterInputChange = this.handlerFilterInputChange.bind(this);
+    this.closeCommentView = this.closeCommentView.bind(this);
+    this.showCommentView = this.showCommentView.bind(this);
+    this.getComments = this.getComments.bind(this);
+    this.addComment = this.addComment.bind(this);
   }
 
   componentWillMount() {
@@ -59,24 +67,25 @@ class Repairs extends React.Component {
     this.getUsers();
   }
 
+  getComments() {
+    this.props.restMethods.getComments(this.state.currentEditRepair.id)
+      .then((comments) => {
+        this.setState({
+          comments
+        });
+        return Promise.resolve();
+      }).catch(() => {
+      });
+  }
+
   getUsers() {
-    if (this.state.isUser) {
-      const currentUser = this.props.getCurrentUser();
-      const users = [currentUser];
-      const userIdNameMap = {};
-      userIdNameMap[currentUser.id] = currentUser.username;
-      this.setState({ userList: users, userIdNameMap });
-      return;
-    }
-    this.props.restMethods.getUsers()
+    this.props.restMethods.getAllUser()
       .then((users) => {
-        let userIdNameMap = this.state.userIdNameMap;
-        userIdNameMap = {};
+        const userIdNameMap = {};
         users.forEach((user) => {
           userIdNameMap[user.id] = user.username;
         });
         this.setState({ userList: users, userIdNameMap });
-
         return Promise.resolve();
       }).catch(() => {});
   }
@@ -315,6 +324,32 @@ class Repairs extends React.Component {
     });
   }
 
+  closeCommentView() {
+    this.setState({
+      showCommentView: false
+    });
+  }
+
+  showCommentView() {
+    this.setState({
+      showCommentView: true
+    });
+    this.getComments();
+  }
+
+  addComment(event) {
+    event.preventDefault();
+    if (this.state.commentText.length > 0) {
+      this.props.restMethods.createComment(this.state.currentEditRepair.id, this.state.commentText)
+        .then(() => {
+          this.getComments();
+          return Promise.resolve();
+        }).catch();
+    }
+
+    this.setState({ commentText: '' });
+  }
+
   render() {
     return (
       <div>
@@ -434,6 +469,7 @@ class Repairs extends React.Component {
                     (<Button
                       block
                       bsSize="large"
+                      onClick={() => this.showCommentView()}
                     >
                   Comments
                     </Button>) : null
@@ -466,6 +502,35 @@ class Repairs extends React.Component {
             </div>
           </Modal.Body>
         </Modal>
+        <Modal show={this.state.showCommentView} onHide={this.closeCommentView} bsSize="large">
+          <Modal.Header closeButton>
+            <Modal.Title>Comments for Repair: {this.state.currentEditRepair ?
+              this.state.currentEditRepair.repairName : null}</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            {
+              this.state.comments.map((comment) =>
+                (<Panel key={comment.id} footer={`Date: ${comment.dateTime} by ${this.state.userIdNameMap[comment.userId]}`}>
+                  {comment.comment}
+                </Panel>)
+              )
+            }
+            <FormGroup controlId="commentText">
+              <ControlLabel>New Comment...</ControlLabel>
+              <FormControl
+                onChange={this.handleCreateRepairChange}
+                componentClass="textarea"
+                placeholder="Write your comment"
+                value={this.state.commentText}
+              />
+            </FormGroup>
+            <Button
+              onClick={this.addComment}
+            >
+              Add Comment
+            </Button>
+          </Modal.Body>
+        </Modal>
       </div>);
   }
 }
@@ -476,9 +541,11 @@ Repairs.propTypes = {
     updateRepair: PropTypes.func.isRequired,
     createRepair: PropTypes.func.isRequired,
     getUsers: PropTypes.func.isRequired,
-    deleteRepair: PropTypes.func.isRequired
+    deleteRepair: PropTypes.func.isRequired,
+    getComments: PropTypes.func.isRequired,
+    getAllUser: PropTypes.func.isRequired,
+    createComment: PropTypes.func.isRequired
   }).isRequired,
   getRole: PropTypes.func.isRequired,
-  getCurrentUser: PropTypes.func.isRequired
 };
 export default Repairs;
