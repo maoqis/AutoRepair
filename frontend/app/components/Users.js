@@ -43,7 +43,7 @@ class Users extends React.Component {
       .then((users) => {
         this.setState({ userList: users });
         return Promise.resolve();
-      }).catch(() => {});
+      }).catch();
   }
 
   deleteUser(userId) {
@@ -85,14 +85,14 @@ class Users extends React.Component {
         this.setState({
           saveButtonText: 'Saved'
         });
-        setTimeout(() => { this.closeEditUser(); }, 2000);
+        setTimeout(() => { this.closeEditUser(); }, 1000);
         return Promise.resolve();
       }).catch(() => {
         // handle conflict username
         this.setState({
           saveButtonText: 'Not Saved'
         });
-        setTimeout(() => { this.closeEditUser(); }, 2000);
+        setTimeout(() => { this.closeEditUser(); }, 1000);
       });
   }
 
@@ -129,7 +129,7 @@ class Users extends React.Component {
         this.setState({
           saveButtonText: 'Saved'
         });
-        setTimeout(() => { this.closeCreateUser(); }, 2000);
+        setTimeout(() => { this.closeCreateUser(); }, 1000);
         this.getUsers();
         return Promise.resolve();
       }).catch((responseStatus) => {
@@ -142,7 +142,7 @@ class Users extends React.Component {
             saveButtonText: 'Not Saved'
           });
         }
-        setTimeout(() => { this.closeCreateUser(); }, 2000);
+        setTimeout(() => { this.closeCreateUser(); }, 1000);
       });
   }
 

@@ -86,14 +86,14 @@ class Managers extends React.Component {
         this.setState({
           saveButtonText: 'Saved'
         });
-        setTimeout(() => { this.closeEditManager(); }, 2000);
+        setTimeout(() => { this.closeEditManager(); }, 1000);
         return Promise.resolve();
       }).catch(() => {
         // todo handle conflict username
         this.setState({
           saveButtonText: 'Not Saved'
         });
-        setTimeout(() => { this.closeEditManager(); }, 2000);
+        setTimeout(() => { this.closeEditManager(); }, 1000);
       });
   }
 
@@ -130,7 +130,7 @@ class Managers extends React.Component {
         this.setState({
           saveButtonText: 'Saved'
         });
-        setTimeout(() => { this.closeCreateManager(); }, 2000);
+        setTimeout(() => { this.closeCreateManager(); }, 1000);
         this.getManagers();
         return Promise.resolve();
       }).catch((responseStatus) => {
@@ -143,7 +143,7 @@ class Managers extends React.Component {
             saveButtonText: 'Not Saved'
           });
         }
-        setTimeout(() => { this.closeCreateManager(); }, 2000);
+        setTimeout(() => { this.closeCreateManager(); }, 1000);
       });
   }
 

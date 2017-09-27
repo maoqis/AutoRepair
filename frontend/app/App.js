@@ -104,8 +104,6 @@ class App extends Component {
   }
 
   authenticate(username, password) {
-    // console.log(`Authenticate call with ${username} ${password}`);
-    // console.log(`Login call with: ${LOGIN_URL}`);
     return this.doWebRequestWithoutAuth(LOGIN_URL, 'post', { username, password })
       .then((user) => {
         const bauthToken = `Basic ${btoa(`${username}:${password}`)}`;
@@ -216,13 +214,31 @@ class App extends Component {
   }
 
   doWebRequest(url, method, body) {
+    if (body) {
+      return fetch(url, {
+        method,
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: this.state.basicAuthToken
+        },
+        body: (JSON.stringify(body)),
+      }).then((response) => {
+        if (response.ok) {
+          return response.json();
+        } else if (response.status === 401) {
+          if (this.isAuthenticated()) {
+            this.logout();
+          }
+        }
+        return Promise.reject(Error(response.status));
+      });
+    }
     return fetch(url, {
       method,
       headers: {
         'Content-Type': 'application/json',
         Authorization: this.state.basicAuthToken
-      },
-      body: body ? (JSON.stringify(body)) : {},
+      }
     }).then((response) => {
       if (response.ok) {
         return response.json();

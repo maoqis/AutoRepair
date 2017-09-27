@@ -312,8 +312,8 @@ class Repairs extends React.Component {
     if (userId === null) return 'None';
     const userIdNameMap = this.state.userIdNameMap;
     const username = userIdNameMap[userId];
-    if (username !== null) return username;
-    return userId;
+    if (username) return username;
+    return 'None';
   }
 
 

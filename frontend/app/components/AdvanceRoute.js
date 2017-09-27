@@ -11,7 +11,7 @@ function AdvanceRoute({ component: CmpntToShow, authStatus, needAuthentication, 
       render={(props) => {
         if (props.match.path === '/login' || props.match.path === '/registeruser') {
           if (authStatus.isAuthenticated()) {
-            return <Redirect to="/repairs" />;
+            return <Redirect to="/" />;
           }
         }
         if (!needAuthentication || (needAuthentication && authStatus.isAuthenticated())) {
