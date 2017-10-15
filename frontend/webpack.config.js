@@ -1,18 +1,12 @@
 const webpack = require('webpack');
 const path = require('path');
-const OpenBrowserPlugin = require('open-browser-webpack-plugin');
+const CopyWebpackPlugin = require('copy-webpack-plugin');
 
 module.exports = {
-  devServer: {
-    historyApiFallback: true,
-    hot: true,
-    inline: true,
-    contentBase: './app',
-    port: 3000
-  },
+  devtool: 'source-map',
   entry: path.resolve(__dirname, 'app/main.js'),
   output: {
-    path: path.resolve(__dirname, 'build'),
+    path: path.resolve(__dirname, '../src/main/resources/static/js/'),
     publicPath: '/',
     filename: './bundle.js'
   },
@@ -26,8 +20,9 @@ module.exports = {
     extensions: ['.js', '.jsx']
   },
   plugins: [
-    new webpack.HotModuleReplacementPlugin(),
-    new OpenBrowserPlugin({ url: 'http://localhost:3000' }),
+    new CopyWebpackPlugin([
+      { from: './app/index.html', to: '../../templates/index.html' }
+    ]),
     new webpack.ProvidePlugin({
       Promise: 'imports-loader?this=>global!exports-loader?global.Promise!es6-promise',
       fetch: 'imports-loader?this=>global!exports-loader?global.fetch!whatwg-fetch'

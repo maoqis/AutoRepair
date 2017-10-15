@@ -10,7 +10,7 @@ module.exports = {
     path.resolve(__dirname, 'app/main.js')
   ],
   output: {
-    path: path.resolve(__dirname, 'build'),
+    path: path.resolve(__dirname, '../src/main/resources/static/js/'),
     publicPath: '/',
     filename: './bundle.js'
   },
@@ -35,8 +35,11 @@ module.exports = {
       }
     }),
     new CopyWebpackPlugin([
-      { from: './app/index.html', to: 'index.html' },
-      { from: './app/main.css', to: 'main.css' }
-    ])
+      { from: './app/index.html', to: '../../templates/index.html' }
+    ]),
+    new webpack.ProvidePlugin({
+      Promise: 'imports-loader?this=>global!exports-loader?global.Promise!es6-promise',
+      fetch: 'imports-loader?this=>global!exports-loader?global.fetch!whatwg-fetch'
+    })
   ]
 };

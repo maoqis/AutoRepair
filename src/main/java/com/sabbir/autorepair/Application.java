@@ -10,9 +10,12 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.context.embedded.EmbeddedServletContainerCustomizer;
+import org.springframework.boot.web.servlet.ErrorPage;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
@@ -24,8 +27,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-import org.springframework.web.servlet.config.annotation.CorsRegistry;
-import org.springframework.web.servlet.config.annotation.EnableWebMvc;
+import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
 import javax.sql.DataSource;
@@ -121,7 +123,7 @@ class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers(HttpMethod.POST, "/api/repair/{id}/comment").hasAnyAuthority("manager", "user")
                 .antMatchers(HttpMethod.GET, "/api/repair/{id}/comment").hasAnyAuthority("manager", "user")
                 .and()
-                .httpBasic();
+                .httpBasic().and().logout().disable();
 
     }
 
@@ -157,19 +159,27 @@ class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         web.debug(false);
         web.ignoring()
                 .antMatchers("/api/registeruser")
-                .antMatchers("/api/login");
+                .antMatchers("/api/login")
+                .antMatchers("/");
     }
 }
 
 @Configuration
-@EnableWebMvc
-class WebConfig extends WebMvcConfigurerAdapter {
+class WebApplicationConfig extends WebMvcConfigurerAdapter {
 
     @Override
-    public void addCorsMappings(CorsRegistry registry) {
-        registry.addMapping("/**").allowedMethods("HEAD", "GET", "PUT", "POST", "DELETE", "PATCH");
-        ;
+    public void addViewControllers(ViewControllerRegistry registry) {
     }
+
+
+    @Bean
+    public EmbeddedServletContainerCustomizer containerCustomizer() {
+        return container -> {
+            container.addErrorPages(new ErrorPage(HttpStatus.NOT_FOUND,
+                    "/others"));
+        };
+    }
+
 }
 
 
