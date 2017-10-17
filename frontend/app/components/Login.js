@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { Button, FormGroup, FormControl, ControlLabel, Modal } from 'react-bootstrap';
+import { Button, FormGroup, FormControl, ControlLabel } from 'react-bootstrap';
 import './Login.css';
 
 class Login extends Component {
@@ -9,8 +9,9 @@ class Login extends Component {
     this.state = {
       username: '',
       password: '',
-      show: false,
-      loginInfo: 'Please wait...'
+      buttonText: 'Login',
+      disabledInput: false,
+      disabledButton: false,
     };
 
     this.handleChange = this.handleChange.bind(this);
@@ -24,12 +25,16 @@ class Login extends Component {
   }
 
   validateForm() {
-    return this.state.username.length > 0 && this.state.password.length > 0;
+    return !this.state.disabledButton
+          && this.state.username.length > 0
+          && this.state.password.length > 0;
   }
 
   handleChange(event) {
     this.setState({
-      [event.target.id]: event.target.value
+      [event.target.id]: event.target.value,
+      buttonText: 'Login',
+      disabledButton: false
     });
   }
 
@@ -38,14 +43,18 @@ class Login extends Component {
     event.preventDefault();
     this.setState(
       {
-        show: true
+        buttonText: 'Logging in ...',
+        disabledButton: true,
+        disabledInput: true
       }
     );
     this.props.restMethods.authenticate(this.state.username, this.state.password)
       .then(() => Promise.resolve())
       .catch(() => {
-        this.setState({ loginInfo: 'login unsuccessful' });
-        window.setTimeout(() => { this.setState({ show: false, loginInfo: 'Please wait' }); }, 3000);
+        this.setState({
+          buttonText: 'Login Unsuccessful',
+          disabledInput: false
+        });
       });
   }
 
@@ -60,6 +69,7 @@ class Login extends Component {
               type="text"
               value={this.state.username}
               onChange={this.handleChange}
+              disabled={this.state.disabledInput}
             />
           </FormGroup>
           <FormGroup controlId="password" bsSize="large">
@@ -67,6 +77,7 @@ class Login extends Component {
             <FormControl
               value={this.state.password}
               onChange={this.handleChange}
+              disabled={this.state.disabledInput}
               type="password"
             />
           </FormGroup>
@@ -76,7 +87,7 @@ class Login extends Component {
             disabled={!this.validateForm()}
             type="submit"
           >
-            Login
+            {this.state.buttonText}
           </Button>
           <Button
             block
@@ -86,14 +97,6 @@ class Login extends Component {
             Create Account
           </Button>
         </form>
-        <Modal show={this.state.show}>
-          <Modal.Header>
-            <Modal.Title>Logging in</Modal.Title>
-          </Modal.Header>
-          <Modal.Body>
-            <p>{this.state.loginInfo}</p>
-          </Modal.Body>
-        </Modal>
       </div>
     );
   }
