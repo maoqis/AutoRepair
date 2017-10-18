@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { Button, FormGroup, FormControl, ControlLabel } from 'react-bootstrap';
-import './Login.css';
+
+import LoginForm from './LoginForm';
 
 class Login extends Component {
   constructor(props) {
@@ -60,44 +60,16 @@ class Login extends Component {
 
   render() {
     return (
-      <div className="Login">
-        <form onSubmit={this.handleSubmit}>
-          <FormGroup controlId="username" bsSize="large">
-            <ControlLabel>Username</ControlLabel>
-            <FormControl
-              autoFocus
-              type="text"
-              value={this.state.username}
-              onChange={this.handleChange}
-              disabled={this.state.disabledInput}
-            />
-          </FormGroup>
-          <FormGroup controlId="password" bsSize="large">
-            <ControlLabel>Password</ControlLabel>
-            <FormControl
-              value={this.state.password}
-              onChange={this.handleChange}
-              disabled={this.state.disabledInput}
-              type="password"
-            />
-          </FormGroup>
-          <Button
-            block
-            bsSize="large"
-            disabled={!this.validateForm()}
-            type="submit"
-          >
-            {this.state.buttonText}
-          </Button>
-          <Button
-            block
-            bsSize="large"
-            onClick={() => this.toRegisterUser()}
-          >
-            Create Account
-          </Button>
-        </form>
-      </div>
+      <LoginForm
+        username={this.state.username}
+        password={this.state.password}
+        buttonText={this.state.buttonText}
+        disabledInput={this.state.disabledInput}
+        handleSubmit={this.handleSubmit}
+        handleChange={this.handleChange}
+        validateForm={this.validateForm}
+        toRegisterUser={this.toRegisterUser}
+      />
     );
   }
 }

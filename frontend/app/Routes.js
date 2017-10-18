@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { Route, Switch } from 'react-router-dom';
 
 import Home from './components/Home';
-import Login from './components/Login';
+import Login from './components/Login/Login';
 import AdvanceRoute from './components/AdvanceRoute';
 import NotFound from './components/NotFound';
 import Logout from './components/Logout';

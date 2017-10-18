@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { Button, FormGroup, FormControl, ControlLabel } from 'react-bootstrap';
-import './Login.css';
+import './Login/Login.css';
 
 class RegisterUser extends Component {
   constructor(props) {
