@@ -9,7 +9,7 @@ import NotFound from './components/NotFound';
 import Logout from './components/Logout';
 import Users from './components/Users';
 import Managers from './components/Managers';
-import RegisterUser from './components/RegisterUser';
+import RegisterUser from './components/RegisterUser/RegisterUser';
 import Repairs from './components/Repairs';
 
 function Routes({ authStatus, restMethods }) {

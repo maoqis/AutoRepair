@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { Button, FormGroup, FormControl, ControlLabel } from 'react-bootstrap';
-import './Login/Login.css';
+
+import RegisterForm from './RegisterForm';
 
 class RegisterUser extends Component {
   constructor(props) {
@@ -66,46 +66,16 @@ class RegisterUser extends Component {
 
   render() {
     return (
-      <div className="Login">
-        <form onSubmit={this.handleSubmit}>
-          <FormGroup controlId="username" bsSize="large">
-            <ControlLabel>Username</ControlLabel>
-            <FormControl
-              autoFocus
-              type="text"
-              value={this.state.username}
-              onChange={this.handleChange}
-              disabled={this.state.disabledInput}
-            />
-          </FormGroup>
-          <FormGroup controlId="passwordOne" bsSize="large">
-            <ControlLabel>Password</ControlLabel>
-            <FormControl
-              value={this.state.passwordOne}
-              onChange={this.handleChange}
-              type="password"
-              disabled={this.state.disabledInput}
-            />
-          </FormGroup>
-          <FormGroup controlId="passwordTwo" bsSize="large">
-            <ControlLabel>Repeat Password</ControlLabel>
-            <FormControl
-              value={this.state.passwordTwo}
-              onChange={this.handleChange}
-              type="password"
-              disabled={this.state.disabledInput}
-            />
-          </FormGroup>
-          <Button
-            block
-            bsSize="large"
-            disabled={!this.validateForm()}
-            type="submit"
-          >
-            {this.state.buttonText}
-          </Button>
-        </form>
-      </div>
+      <RegisterForm
+        username={this.state.username}
+        passwordOne={this.state.passwordOne}
+        passwordTwo={this.state.passwordTwo}
+        buttonText={this.state.buttonText}
+        disabledInput={this.state.disabledInput}
+        handleSubmit={this.handleSubmit}
+        handleChange={this.handleChange}
+        validateForm={this.validateForm}
+      />
     );
   }
 }
