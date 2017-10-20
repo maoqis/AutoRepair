@@ -7,8 +7,8 @@ import Login from './components/Login/Login';
 import AdvanceRoute from './components/AdvanceRoute';
 import NotFound from './components/NotFound';
 import Logout from './components/Logout';
-import Users from './components/Users';
-import Managers from './components/Managers';
+import Users from './components/Users/Users';
+import Managers from './components/Users/Managers';
 import RegisterUser from './components/RegisterUser/RegisterUser';
 import Repairs from './components/Repairs';
 

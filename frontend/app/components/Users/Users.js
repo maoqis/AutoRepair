@@ -1,7 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Table, Button, Modal, FormGroup, FormControl, ControlLabel, ButtonToolbar } from 'react-bootstrap';
+import { Button, ButtonToolbar } from 'react-bootstrap';
 
+import UserListView from './UserListView';
+import CreateOrEditUserView from './CreateOrEditUserView';
 import './Users.css';
 
 class Users extends React.Component {
@@ -164,84 +166,33 @@ class Users extends React.Component {
         <ButtonToolbar>
           <Button bsStyle="primary" className="buttonBar" onClick={this.showCreateUser}>Create New User</Button>
         </ButtonToolbar>
-        <Table striped>
-          <tbody>
-            { this.state.userList.map((user) =>
-              (<tr key={user.id}>
-                <td>{user.username}</td>
-                <td>
-                  <Button bsStyle="success" onClick={() => this.showEditUser(user)}>Edit</Button>
-                </td>
-                <td>
-                  <Button bsStyle="danger" onClick={() => this.deleteUser(user.id)}>Delete</Button>
-                </td>
-              </tr>)
-            )}
-          </tbody>
-        </Table>
-        <Modal show={this.state.showEditUser} onHide={this.closeEditUser}>
-          <Modal.Header closeButton>
-            <Modal.Title>Editing user {this.state.currentUser ? this.state.currentUser.username : ''}</Modal.Title>
-          </Modal.Header>
-          <Modal.Body>
-            <div className="Edit">
-              <form onSubmit={this.handleEditSubmit}>
-                <FormGroup controlId="password" bsSize="large">
-                  <ControlLabel>Password</ControlLabel>
-                  <FormControl
-                    value={this.state.currentUserPassword}
-                    onChange={this.handleEditChange}
-                    type="password"
-                  />
-                </FormGroup>
-                <Button
-                  block
-                  bsSize="large"
-                  disabled={!this.validateEditForm()}
-                  type="submit"
-                >
-                  {this.state.saveButtonText}
-                </Button>
-              </form>
-            </div>
-          </Modal.Body>
-        </Modal>
-        <Modal show={this.state.showCreateUser} onHide={this.closeCreateUser}>
-          <Modal.Header closeButton>
-            <Modal.Title>New User</Modal.Title>
-          </Modal.Header>
-          <Modal.Body>
-            <div className="Edit">
-              <form onSubmit={this.handleCreateSubmit}>
-                <FormGroup controlId="username" bsSize="large">
-                  <ControlLabel>Username</ControlLabel>
-                  <FormControl
-                    autoFocus
-                    type="text"
-                    value={this.state.username}
-                    onChange={this.handleCreateChange}
-                  />
-                </FormGroup>
-                <FormGroup controlId="password" bsSize="large">
-                  <ControlLabel>Password</ControlLabel>
-                  <FormControl
-                    value={this.state.password}
-                    onChange={this.handleCreateChange}
-                    type="password"
-                  />
-                </FormGroup>
-                <Button
-                  block
-                  bsSize="large"
-                  disabled={!this.validateNewUserForm()}
-                  type="submit"
-                >
-                  {this.state.saveButtonText}
-                </Button>
-              </form>
-            </div>
-          </Modal.Body>
-        </Modal>
+        <UserListView
+          userList={this.state.userList}
+          showEditUser={this.showEditUser}
+          deleteUser={this.deleteUser}
+        />
+        <CreateOrEditUserView
+          showModal={this.state.showEditUser}
+          onHideCallback={this.closeEditUser}
+          modalTitle={'Editing user'.concat(this.state.currentUser ? this.state.currentUser.username : '')}
+          handleSubmit={this.handleEditSubmit}
+          handleChange={this.handleEditChange}
+          password={this.state.currentUserPassword}
+          validateForm={this.validateEditForm}
+          saveButtonText={this.state.saveButtonText}
+        />
+        <CreateOrEditUserView
+          showModal={this.state.showCreateUser}
+          onHideCallback={this.closeCreateUser}
+          modalTitle="New User"
+          handleSubmit={this.handleCreateSubmit}
+          showUserName
+          username={this.state.username}
+          handleChange={this.handleCreateChange}
+          password={this.state.password}
+          validateForm={this.validateNewUserForm}
+          saveButtonText={this.state.saveButtonText}
+        />
       </div>);
   }
 }
