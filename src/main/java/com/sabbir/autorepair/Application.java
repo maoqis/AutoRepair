@@ -64,9 +64,33 @@ class ApplicationLoader implements CommandLineRunner {
         if (userService.getUserByUsername("user1") == null)
             userService.createUser(user);
 
-        final RepairEntity repairEntity = new RepairEntity();
+        RepairEntity repairEntity = new RepairEntity();
         repairEntity.setDateTime("2017-09-23 17:00");
         repairEntity.setRepairName("repair x");
+        repairEntity.setDescription("Hello world");
+        repairEntity.setAssignedUserId(2L);
+        try {
+            final Repair repair = repairService.createRepair(repairEntity);
+            logger.info("Repair: " + repair.toString());
+        } catch (Exception ex) {
+
+        }
+
+        repairEntity = new RepairEntity();
+        repairEntity.setDateTime("2017-09-23 18:00");
+        repairEntity.setRepairName("repair y");
+        repairEntity.setDescription("Hello world");
+        repairEntity.setAssignedUserId(2L);
+        try {
+            final Repair repair = repairService.createRepair(repairEntity);
+            logger.info("Repair: " + repair.toString());
+        } catch (Exception ex) {
+
+        }
+
+        repairEntity = new RepairEntity();
+        repairEntity.setDateTime("2017-09-24 17:00");
+        repairEntity.setRepairName("repair z");
         repairEntity.setDescription("Hello world");
         repairEntity.setAssignedUserId(2L);
         try {

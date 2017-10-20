@@ -187,6 +187,7 @@ class Users extends React.Component {
           modalTitle="New User"
           handleSubmit={this.handleCreateSubmit}
           showUserName
+          usernameLabel="Username"
           username={this.state.username}
           handleChange={this.handleCreateChange}
           password={this.state.password}

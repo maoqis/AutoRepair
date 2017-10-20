@@ -1,7 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Table, Button, Modal, FormGroup, FormControl, ControlLabel, ButtonToolbar } from 'react-bootstrap';
+import { Button, ButtonToolbar } from 'react-bootstrap';
 
+import UserListView from './UserListView';
+import CreateOrEditUserView from './CreateOrEditUserView';
 import './Users.css';
 
 class Managers extends React.Component {
@@ -51,7 +53,7 @@ class Managers extends React.Component {
       .then(() => {
         this.getManagers();
         return Promise.resolve();
-      }).catch();
+      }).catch(() => {});
   }
 
   showEditManager(manager) {
@@ -165,84 +167,34 @@ class Managers extends React.Component {
         <ButtonToolbar>
           <Button bsStyle="primary" className="buttonBar" onClick={this.showCreateManager}>Create New Manager</Button>
         </ButtonToolbar>
-        <Table striped>
-          <tbody>
-            { this.state.managerList.map((manager) =>
-              (<tr key={manager.id}>
-                <td>{manager.username}</td>
-                <td>
-                  <Button bsStyle="success" onClick={() => this.showEditManager(manager)}>Edit</Button>
-                </td>
-                <td>
-                  <Button bsStyle="danger" onClick={() => this.deleteManager(manager.id)}>Delete</Button>
-                </td>
-              </tr>)
-            )}
-          </tbody>
-        </Table>
-        <Modal show={this.state.showEditManager} onHide={this.closeEditManager}>
-          <Modal.Header closeButton>
-            <Modal.Title>Editing manager {this.state.currentManager ? this.state.currentManager.username : ''}</Modal.Title>
-          </Modal.Header>
-          <Modal.Body>
-            <div className="Edit">
-              <form onSubmit={this.handleEditSubmit}>
-                <FormGroup controlId="password" bsSize="large">
-                  <ControlLabel>Password</ControlLabel>
-                  <FormControl
-                    value={this.state.currentManagerPassword}
-                    onChange={this.handleEditChange}
-                    type="password"
-                  />
-                </FormGroup>
-                <Button
-                  block
-                  bsSize="large"
-                  disabled={!this.validateEditForm()}
-                  type="submit"
-                >
-                  {this.state.saveButtonText}
-                </Button>
-              </form>
-            </div>
-          </Modal.Body>
-        </Modal>
-        <Modal show={this.state.showCreateManager} onHide={this.closeCreateManager}>
-          <Modal.Header closeButton>
-            <Modal.Title>New Manager</Modal.Title>
-          </Modal.Header>
-          <Modal.Body>
-            <div className="Edit">
-              <form onSubmit={this.handleCreateSubmit}>
-                <FormGroup controlId="username" bsSize="large">
-                  <ControlLabel>Managername</ControlLabel>
-                  <FormControl
-                    autoFocus
-                    type="text"
-                    value={this.state.username}
-                    onChange={this.handleCreateChange}
-                  />
-                </FormGroup>
-                <FormGroup controlId="password" bsSize="large">
-                  <ControlLabel>Password</ControlLabel>
-                  <FormControl
-                    value={this.state.password}
-                    onChange={this.handleCreateChange}
-                    type="password"
-                  />
-                </FormGroup>
-                <Button
-                  block
-                  bsSize="large"
-                  disabled={!this.validateNewManagerForm()}
-                  type="submit"
-                >
-                  {this.state.saveButtonText}
-                </Button>
-              </form>
-            </div>
-          </Modal.Body>
-        </Modal>
+        <UserListView
+          userList={this.state.managerList}
+          showEditUser={this.showEditManager}
+          deleteUser={this.deleteManager}
+        />
+        <CreateOrEditUserView
+          showModal={this.state.showEditManager}
+          onHideCallback={this.closeEditManager}
+          modalTitle={'Editing manager'.concat(this.state.currentManager ? this.state.currentManager.username : '')}
+          handleSubmit={this.handleEditSubmit}
+          handleChange={this.handleEditChange}
+          password={this.state.currentManagerPassword}
+          validateForm={this.validateEditForm}
+          saveButtonText={this.state.saveButtonText}
+        />
+        <CreateOrEditUserView
+          showModal={this.state.showCreateManager}
+          onHideCallback={this.closeCreateManager}
+          modalTitle="New Manager"
+          handleSubmit={this.handleCreateSubmit}
+          showUserName
+          usernameLabel="Managername"
+          username={this.state.username}
+          handleChange={this.handleCreateChange}
+          password={this.state.password}
+          validateForm={this.validateNewManagerForm}
+          saveButtonText={this.state.saveButtonText}
+        />
       </div>);
   }
 }

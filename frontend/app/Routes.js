@@ -10,7 +10,7 @@ import Logout from './components/Logout';
 import Users from './components/Users/Users';
 import Managers from './components/Users/Managers';
 import RegisterUser from './components/RegisterUser/RegisterUser';
-import Repairs from './components/Repairs';
+import Repairs from './components/Repairs/Repairs';
 
 function Routes({ authStatus, restMethods }) {
   return (

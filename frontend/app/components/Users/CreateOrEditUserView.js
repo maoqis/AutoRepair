@@ -13,7 +13,7 @@ export default function CreateOrEditUserView(props) {
           <form onSubmit={props.handleSubmit}>
             {props.showUserName ? (
               <FormGroup controlId="username" bsSize="large">
-                <ControlLabel>Username</ControlLabel>
+                <ControlLabel>{props.usernameLabel}</ControlLabel>
                 <FormControl
                   autoFocus
                   type="text"
@@ -50,6 +50,7 @@ CreateOrEditUserView.propTypes = {
   modalTitle: PropTypes.string.isRequired,
   handleSubmit: PropTypes.func.isRequired,
   showUserName: PropTypes.bool,
+  usernameLabel: PropTypes.string,
   username: PropTypes.string,
   handleChange: PropTypes.func.isRequired,
   password: PropTypes.string.isRequired,
@@ -60,5 +61,6 @@ CreateOrEditUserView.propTypes = {
 CreateOrEditUserView.defaultProps = {
   showModal: false,
   showUserName: false,
-  username: ''
+  username: '',
+  usernameLabel: ''
 };

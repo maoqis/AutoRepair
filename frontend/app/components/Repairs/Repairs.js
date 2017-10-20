@@ -1,7 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Table, Button, Modal, FormGroup, FormControl, ControlLabel, ButtonToolbar, Alert, Form, Panel } from 'react-bootstrap';
+import { Button, ButtonToolbar } from 'react-bootstrap';
 
+import RepairFilterView from './RepairFilterView';
+import RepairListView from './RepairListView';
+import CreateEditRepairView from './CreateEditRepairView';
+import CommentView from './CommentView';
 import './Repairs.css';
 
 class Repairs extends React.Component {
@@ -185,7 +189,7 @@ class Repairs extends React.Component {
           this.setState({
             savebuttontext: isUpdate ? 'unable to update' : 'unable to create',
             savebuttonclickable: true,
-            deletebuttonclickable: true
+            deleteButtonClickable: true
           });
         }
       });
@@ -287,7 +291,7 @@ class Repairs extends React.Component {
       repairDescription: repair.description,
       repairDateTime: repair.dateTime.replace(' ', 'T'),
       status: repair.status,
-      assignedUserId: repair.assignedUserId === null ? -1 : repair.assignedUserId,
+      assignedUserId: repair.assignedUserId === null ? -1 : parseInt(repair.assignedUserId, 10),
       saveButtonText: 'Update',
       dateIsValid: true,
       isEditRepair: true,
@@ -357,180 +361,48 @@ class Repairs extends React.Component {
           (<ButtonToolbar>
             <Button bsStyle="primary" className="buttonBar" onClick={this.showCreateRepair}>Create New Repair</Button>
           </ButtonToolbar>) }
-        <Form inline>
-          <FormGroup controlId="filterDate">
-            <FormControl type="text" placeholder="Date (yyyy-mm-dd)" onChange={this.handlerFilterInputChange} />
-          </FormGroup>
-          {' '}
-          <FormGroup controlId="filterTime">
-            <FormControl type="text" placeholder="Time (hh:mm)" onChange={this.handlerFilterInputChange} />
-          </FormGroup>
-          {' '}
-          { this.state.isUser ? null : (
-            <FormGroup controlId="filterUser">
-              <FormControl type="text" placeholder="Assigned User" onChange={this.handlerFilterInputChange} />
-            </FormGroup>)}
-          {' '}
-          <FormGroup controlId="filterStatus">
-            <FormControl componentClass="select" value={this.state.filterStatus} onChange={this.handlerFilterInputChange}>
-              <option value="all">Status</option>
-              <option value="incomplete">Incomplete</option>
-              <option value="approve">Need Approval</option>
-              <option value="complete">Complete</option>
-            </FormControl>
-          </FormGroup>
-        </Form>
-        <Table striped bordered hover>
-          <thead>
-            <tr>
-              <th>#</th>
-              <th>Repair Name</th>
-              <th>Date and Time</th>
-              <th>Assigned To</th>
-              <th>Status</th>
-            </tr>
-          </thead>
-          <tbody >
-            { this.state.filterredRepairList.map((repair) =>
-              (<tr key={repair.id} onClick={() => { this.showEditRepair(repair); }}>
-                <td>{repair.id}</td>
-                <td>{repair.repairName}</td>
-                <td>{repair.dateTime}</td>
-                <td>{this.getUserNameFromId(repair.assignedUserId)}</td>
-                <td>{repair.status === 'approve' ? 'need approval' : repair.status}</td>
-              </tr>)
-            )}
-          </tbody>
-        </Table>
-        <Modal show={this.state.showCreateRepair} onHide={this.closeCreateRepair}>
-          <Modal.Header closeButton>
-            <Modal.Title>{this.state.isEditRepair ? 'Edit Repair' : 'New Repair'}</Modal.Title>
-          </Modal.Header>
-          <Modal.Body>
-            <div className="Edit">
-              <form onSubmit={this.handleCreateRepairSubmit}>
-                <FormGroup controlId="repairName" bsSize="large">
-                  <ControlLabel>Repair Name</ControlLabel>
-                  <FormControl
-                    autoFocus
-                    type="text"
-                    value={this.state.repairName}
-                    onChange={this.handleCreateRepairChange}
-                    disabled={this.state.isUser}
-                  />
-                </FormGroup>
-                <FormGroup controlId="repairDescription" bsSize="large">
-                  <ControlLabel>Description</ControlLabel>
-                  <FormControl
-                    componentClass="textarea"
-                    value={this.state.repairDescription}
-                    onChange={this.handleCreateRepairChange}
-                    disabled={this.state.isUser}
-                  />
-                </FormGroup>
-                <FormGroup controlId="repairDateTime" bsSize="large">
-                  <ControlLabel>Date and Time</ControlLabel>
-                  <FormControl
-                    type="datetime-local"
-                    value={this.state.repairDateTime}
-                    onChange={this.handleCreateRepairChange}
-                    disabled={this.state.isUser}
-                  />
-                </FormGroup>
-                <FormGroup controlId="assignedUserId" bsSize="large">
-                  <ControlLabel>Assign To</ControlLabel>
-                  <FormControl
-                    componentClass="select"
-                    onChange={this.handleCreateRepairChange}
-                    value={this.state.assignedUserId}
-                    disabled={this.state.isUser}
-                  >
-                    <option value="-1">None</option>
-                    {this.state.userList.map((user) =>
-                      (<option key={user.id} value={user.id}>{user.username}</option>)
-                    )}
-                  </FormControl>
-                </FormGroup>
-                <FormGroup controlId="status" bsSize="large">
-                  <ControlLabel>Status</ControlLabel>
-                  <FormControl
-                    componentClass="select"
-                    onChange={this.handleCreateRepairChange}
-                    value={this.state.status}
-                    disabled={this.isStatusDisable()}
-                  >
-                    <option value="incomplete">Incomplete</option>
-                    <option value="approve">Need Approval</option>
-                    {!this.state.isUser ? <option value="complete">Complete</option> : null}
-                  </FormControl>
-                </FormGroup>
-                {
-                  this.state.isEditRepair ?
-                    (<Button
-                      block
-                      bsSize="large"
-                      onClick={() => this.showCommentView()}
-                    >
-                  Comments
-                    </Button>) : null
-                }
-                <Button
-                  block
-                  bsSize="large"
-                  type="submit"
-                  disabled={!this.validateNewRepairForm()}
-                >
-                  {this.state.saveButtonText}
-                </Button>
-                {
-                  (!this.state.isUser && this.state.isEditRepair) ?
-                    (<Button
-                      block
-                      bsStyle="danger"
-                      bsSize="large"
-                      disabled={!this.state.deleteButtonClickable}
-                      onClick={() => this.deleteRepair()}
-                    >
-                      {this.state.deleteButtonText}
-                    </Button>) : null
-                }
-              </form>
-              {this.state.validateionMessage.length > 0 ? (<Alert bsStyle="danger" className="alert">
-                {this.state.validateionMessage}
-              </Alert>) : null
-              }
-            </div>
-          </Modal.Body>
-        </Modal>
-        <Modal show={this.state.showCommentView} onHide={this.closeCommentView} bsSize="large">
-          <Modal.Header closeButton>
-            <Modal.Title>Comments for Repair: {this.state.currentEditRepair ?
-              this.state.currentEditRepair.repairName : null}</Modal.Title>
-          </Modal.Header>
-          <Modal.Body>
-            {
-              this.state.comments.map((comment) =>
-                (<Panel key={comment.id} footer={`Date: ${comment.dateTime} by ${this.state.userIdNameMap[comment.userId]}`}>
-                  {comment.comment}
-                </Panel>)
-              )
-            }
-            <FormGroup controlId="commentText">
-              <ControlLabel>New Comment...</ControlLabel>
-              <FormControl
-                onChange={this.handleCreateRepairChange}
-                componentClass="textarea"
-                placeholder="Write your comment"
-                value={this.state.commentText}
-              />
-            </FormGroup>
-            <Button
-              onClick={this.addComment}
-            >
-              Add Comment
-            </Button>
-          </Modal.Body>
-        </Modal>
+        <RepairFilterView
+          handlerFilterInputChange={this.handlerFilterInputChange}
+          isUser={this.state.isUser}
+          filterStatus={this.state.filterStatus}
+        />
+        <RepairListView
+          repairList={this.state.filterredRepairList}
+          getUserNameFromId={this.getUserNameFromId}
+          showEditRepair={this.showEditRepair}
+        />
+        <CreateEditRepairView
+          showModal={this.state.showCreateRepair}
+          onModalHide={this.closeCreateRepair}
+          isEditRepair={this.state.isEditRepair}
+          handleCreateRepairSubmit={this.handleCreateRepairSubmit}
+          repairName={this.state.repairName}
+          handleCreateRepairChange={this.handleCreateRepairChange}
+          isUser={this.state.isUser}
+          repairDescription={this.state.repairDescription}
+          repairDateTime={this.state.repairDateTime}
+          assignedUserId={this.state.assignedUserId}
+          userList={this.state.userList}
+          status={this.state.status}
+          isStatusDisable={this.isStatusDisable}
+          showCommentView={this.showCommentView}
+          validateNewRepairForm={this.validateNewRepairForm}
+          saveButtonText={this.state.saveButtonText}
+          deleteButtonClickable={this.state.deleteButtonClickable}
+          deleteRepair={this.deleteRepair}
+          deleteButtonText={this.state.deleteButtonText}
+          validationMessage={this.state.validateionMessage}
+        />
+        <CommentView
+          showModal={this.state.showCommentView}
+          onModalHide={this.closeCommentView}
+          currentEditRepair={this.state.currentEditRepair}
+          comments={this.state.comments}
+          handleCreateRepairChange={this.handleCreateRepairChange}
+          commentText={this.state.commentText}
+          addComment={this.addComment}
+          userIdNameMap={this.state.userIdNameMap}
+        />
       </div>);
   }
 }
