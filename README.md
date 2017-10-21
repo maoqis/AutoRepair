@@ -1,6 +1,8 @@
 # AutoRepair
 
-An auto repair management tool built using spring and reactjs with rest.
+An auto repair management tool.
+
+A sample project using Reactjs, Spring, Spring-data-jpa with rest.
 
 ## Getting Started
 
