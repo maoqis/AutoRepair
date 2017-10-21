@@ -66,7 +66,6 @@ public class RepairService {
             }
             repair.setAssignedUserId(repairEntity.getAssignedUserId());
         }
-        logger.info(repair.toString());
         Repair savedRepair = repairRepository.save(repair);
         savedRepair = repairRepository.findOne(savedRepair.getId());
         return savedRepair;
